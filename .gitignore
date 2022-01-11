@@ -1,0 +1,11 @@
+#modules
+node_modules
+#lock files
+package-lock.json
+yarn.lock
+#environmental variables
+.env
+#log files
+*.log
+#keys
+ssh_*
