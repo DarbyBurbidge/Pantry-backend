@@ -9,7 +9,9 @@ import app from "./server";
 import { UserResolver } from "./resolvers/user.resolver";
 
 
+
 dotenv.config()
+//console.log(process.env.ACCESS_TOKEN_SECRET)
 mongoose.connect(
     `${process.env.DB_URI}`,
     async err => {

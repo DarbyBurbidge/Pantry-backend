@@ -1,5 +1,6 @@
 import { mongoose, prop } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
+import { Category } from "./category.model";
 
 @ObjectType()
 export class User {
@@ -8,14 +9,17 @@ export class User {
     readonly _id: mongoose.Types.ObjectId;
 
     @Field() @prop({ required: true, unique: true })
-    email!: string
+    email!: string;
 
     @prop({ required: true })
-    salt!: string
+    salt!: string;
 
     @prop({ required: true })
-    pw_hash!: string
+    pw_hash!: string;
 
     @Field() @prop({ default: 0})
-    tokenVersion!: number
+    tokenVersion!: number;
+
+    @Field(() => [Category]) @prop({required: true})
+    catagories!: [Category];
 }
