@@ -1,21 +1,15 @@
 import { getModelForClass } from "@typegoose/typegoose";
 import { Category } from "../models/category.model";
 import { Item } from "../models/item.model";
-import { Arg, Ctx, Field, FieldResolver, Mutation, ObjectType, Query, Resolver, Root, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import { AppContext } from "../context/app.context";
 import { isAuth } from "../middleware/isauth.middleware";
+import { ReturnObject } from "./returnObject.resolver";
 
-@ObjectType()
-class ReturnObject {
-    @Field()
-    message: string
-    @Field()
-    return: boolean
-}
 
 @Resolver(Category)
 export class CategoryResolver {
-    @Query(() => [Category], {nullable: true})
+    @Query(() => [Category], { nullable: true })
     async getCategories() {
         return await getModelForClass(Category).find()
     }
@@ -70,7 +64,7 @@ export class CategoryResolver {
     }
 
 
-    @FieldResolver(() => [Item])
+    @FieldResolver(() => [Item], { nullable: true })
     async items(
         @Root() category : any
     ) {
@@ -78,7 +72,7 @@ export class CategoryResolver {
             return await getModelForClass(Item).find({ categoryId: category._id })
         } catch (err) {
             console.error(err)
-            throw new Error(err)
+            return null
         }
     }
 }

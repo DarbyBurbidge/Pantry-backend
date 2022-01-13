@@ -15,6 +15,6 @@ export class Category {
     @Field() @prop({ required: true, unique: true })
     categoryName: string;
 
-    @Field(() => [Item])
+    @Field(() => [Item], { nullable: true })
     items: [Item];
 }

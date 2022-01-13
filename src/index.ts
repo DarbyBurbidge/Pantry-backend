@@ -8,6 +8,7 @@ import { buildSchema } from "type-graphql";
 import app from "./server";
 import { UserResolver } from "./resolvers/user.resolver";
 import { CategoryResolver } from "./resolvers/category.resolver";
+import { ItemResolver } from "./resolvers/item.resolver";
 
 
 
@@ -33,7 +34,7 @@ db.once('open', async () => {
 (async () => {
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver, CategoryResolver]
+            resolvers: [UserResolver, CategoryResolver, ItemResolver]
         }),
         context: ({req, res}) => ({req, res})
     });

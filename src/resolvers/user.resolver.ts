@@ -9,6 +9,7 @@ import { User } from "../models/user.model";
 import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
 import { hashPassword, verifyPassword } from "../lib/utils";
 import { Category } from "../models/category.model";
+import { ReturnObject } from "./returnObject.resolver";
 
 @ObjectType()
 class LoginResponse {
@@ -90,7 +91,7 @@ export class UserResolver {
 
     //Create a new User with client provided info
     //return whether the User was created properly
-    @Mutation(() => Boolean)
+    @Mutation(() => ReturnObject)
     async register(
         @Arg('email') email: string,
         @Arg('userName') userName: string,
@@ -102,18 +103,18 @@ export class UserResolver {
             await getModelForClass(Category).create({categoryName: `${userName}'s Pantry`, userId: user._id});
         } catch (err) {
             console.log(err);
-            return false
+            return {message: `${err}`, return: false}
         }
-        return true
+        return {message: "OK", return: true}
     }
 
     //Logout the user
-    @Mutation(() => Boolean)
+    @Mutation(() => ReturnObject)
     async logout(
         @Ctx() {res}: AppContext
         ) {
             sendRefreshToken(res, "");
-            return true
+            return {message: "OK", return: true}
         }
 
     
