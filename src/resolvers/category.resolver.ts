@@ -55,6 +55,10 @@ export class CategoryResolver {
             if (await getModelForClass(Category).find({userId: payload?.userId}).length <= 1) {
                 return {message: "Cannot delete all categories, please edit the last category if you wish to change it", return: false}
             }
+            // Prune all items associated with the category
+            // TODO: add a migration boolean and id
+            // to move items to a different category
+            await getModelForClass(Item).deleteMany({categoryId: _id})
             await getModelForClass(Category).findByIdAndDelete(_id)
         } catch (err) {
             console.error(err)

@@ -5,6 +5,7 @@ package-lock.json
 yarn.lock
 #environmental variables
 .env
+.todo
 #log files
 *.log
 #keys
