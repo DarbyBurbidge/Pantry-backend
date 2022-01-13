@@ -27,7 +27,7 @@ app.post("/refresh_token", async (req, res) => {
     //attempt to verify
     let payload: any = null;
     try {
-        payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)        
+        payload = verify(token, process.env.REFRESH_TOKEN_PUBLIC!, { algorithms: ['ES512'] })        
     } catch (err) {
         console.error(err);
         return res.send({ ok: false, accessToken: '' })

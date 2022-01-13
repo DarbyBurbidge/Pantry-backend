@@ -8,7 +8,7 @@ export const createAccessToken = (user: User) => {
 };
 
 export const createRefreshToken = (user: User) => {
-    return sign({ userId: user._id.toString(), tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, {expiresIn: "7d"});
+    return sign({ userId: user._id.toString(), tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, {expiresIn: "7d", algorithm: 'ES512'});
 };
 
 export const sendRefreshToken = (res: Response, token: string) => {

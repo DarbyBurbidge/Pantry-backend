@@ -11,7 +11,7 @@ export const isAuth: MiddlewareFn<AppContext> = ({context}, next) => {
     }
     try {
         const token = authorization?.split(' ')[1]
-        const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+        const payload = verify(token, process.env.ACCESS_TOKEN_PUBLIC!, {algorithms: ['ES512']})
         context.payload = payload as any;
     } catch (err) {
         console.error(err);

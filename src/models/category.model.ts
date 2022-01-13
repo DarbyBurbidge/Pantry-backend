@@ -9,9 +9,12 @@ export class Category {
     @Field(() => ID) @prop({ auto: true })
     readonly _id: mongoose.Types.ObjectId;
 
+    @Field() @prop({required: true})
+    userId: string
+
     @Field() @prop({ required: true, unique: true })
     categoryName: string;
 
-    @Field(() => ([Item] || null)) @prop()
-    items: [Item] | null;
+    @Field(() => [Item])
+    items: [Item];
 }

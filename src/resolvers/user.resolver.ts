@@ -1,5 +1,5 @@
 // NPM MODULES
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Field, Ctx, FieldResolver, Mutation, ObjectType, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import { getModelForClass } from "@typegoose/typegoose";
 import { verify } from "jsonwebtoken";
 // DEV MODULES
@@ -8,6 +8,7 @@ import { isAuth } from "../middleware/isauth.middleware";
 import { User } from "../models/user.model";
 import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
 import { hashPassword, verifyPassword } from "../lib/utils";
+import { Category } from "../models/category.model";
 
 @ObjectType()
 class LoginResponse {
@@ -18,7 +19,7 @@ class LoginResponse {
     user: User
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
     @Query(() => String)
     hello() {
@@ -32,6 +33,7 @@ export class UserResolver {
     ) {
         return `your user id is: ${payload!.userId}`
     }
+
 
     //Get current User
     @Query(() => User, { nullable: true })
@@ -91,11 +93,13 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async register(
         @Arg('email') email: string,
-        @Arg('password') password: string,
+        @Arg('userName') userName: string,
+        @Arg('password') password: string
     ) {
         const saltHash = hashPassword(password)
         try {
-            await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            const user = await getModelForClass(User).create({email: `${email}`, userName: `${userName}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            await getModelForClass(Category).create({categoryName: `${userName}'s Pantry`, userId: user._id});
         } catch (err) {
             console.log(err);
             return false
@@ -111,4 +115,17 @@ export class UserResolver {
             sendRefreshToken(res, "");
             return true
         }
+
+    
+    @FieldResolver(() => [Category])
+    async categories(
+        @Root() user : any
+    ) {
+        try {
+            return await getModelForClass(Category).find({userId: user?._id})
+        } catch (err) {
+            console.log(err)
+            throw new Error(err)
+        }
+    }
 }
