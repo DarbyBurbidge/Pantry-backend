@@ -15,9 +15,8 @@ import { ReturnObject } from "./returnObject.resolver";
 class LoginResponse {
     @Field()
     accessToken: string;
-
     @Field(() => User)
-    user: User
+    user: User;
 }
 
 @Resolver(User)

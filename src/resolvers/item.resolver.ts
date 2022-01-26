@@ -6,6 +6,17 @@ import { isAuth } from "../middleware/isauth.middleware";
 import { ReturnObject } from "./returnObject.resolver";
 
 
+const generateDate = (date: string) => {
+    if (date == 'N/A') {
+        return date
+    }
+    const seperated = date.split('-')
+    const day = parseInt(seperated[2])
+    const month = parseInt(seperated[1])
+    const year = seperated[0].substring(seperated.length - 1);
+    return `${month}/${day}/${year}`
+}
+
 @Resolver()
 export class ItemResolver {
     @Query(() => [Item], { nullable: true })
@@ -22,7 +33,8 @@ export class ItemResolver {
         @Ctx() { payload }: AppContext
     ) {
         try {
-            await getModelForClass(Item).create({categoryId: categoryId, userId: payload?.userId, itemName: itemName, expiration: expiration})
+            const date = generateDate(expiration)
+            await getModelForClass(Item).create({categoryId: categoryId, userId: payload?.userId, itemName: itemName, expiration: date})
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
@@ -39,7 +51,8 @@ export class ItemResolver {
         @Ctx() { payload }: AppContext
     ) {
         try {
-            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: expiration})
+            const date = generateDate(expiration);
+            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: date})
         } catch (err) {
             console.log(err)
             return {message: `${err}`, return: false}
