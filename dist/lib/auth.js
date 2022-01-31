@@ -13,7 +13,9 @@ exports.createRefreshToken = createRefreshToken;
 const sendRefreshToken = (res, token) => {
     res.cookie("jid", token, {
         httpOnly: true,
-        path: '/refresh_token'
+        path: '/refresh_token',
+        sameSite: 'none',
+        secure: true
     });
 };
 exports.sendRefreshToken = sendRefreshToken;
