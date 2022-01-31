@@ -72,11 +72,11 @@ let UserResolver = class UserResolver {
             user
         };
     }
-    async register(email, userName, password) {
+    async register(email, password) {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
-            const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, userName: `${userName}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
-            await (0, typegoose_1.getModelForClass)(category_model_1.Category).create({ categoryName: `${userName}'s Pantry`, userId: user._id });
+            const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+            await (0, typegoose_1.getModelForClass)(category_model_1.Category).create({ categoryName: 'Your Pantry', userId: user._id });
         }
         catch (err) {
             console.log(err);
@@ -131,10 +131,9 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     __param(0, (0, type_graphql_1.Arg)('email')),
-    __param(1, (0, type_graphql_1.Arg)('userName')),
-    __param(2, (0, type_graphql_1.Arg)('password')),
+    __param(1, (0, type_graphql_1.Arg)('password')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 __decorate([
