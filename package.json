@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "v16.13.0"
+  },
   "dependencies": {
     "@typegoose/typegoose": "^9.4.0",
     "apollo-server-express": "^3.6.1",
