@@ -26,11 +26,6 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
-    __metadata("design:type", String)
-], User.prototype, "userName", void 0);
-__decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "salt", void 0);
