@@ -33,10 +33,6 @@ db.once('open', async () => {
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({ app: server_1.default, cors: false });
-<<<<<<< HEAD
-    server_1.default.listen(process.env.API_PORT, () => { console.log(`Listening on port ${process.env.API_PORT}`); });
-=======
     server_1.default.listen(process.env.PORT, () => { console.log(`Listening on port ${process.env.PORT}`); });
->>>>>>> dev
 })();
 //# sourceMappingURL=index.js.map
