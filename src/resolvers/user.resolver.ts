@@ -93,13 +93,12 @@ export class UserResolver {
     @Mutation(() => ReturnObject)
     async register(
         @Arg('email') email: string,
-        @Arg('userName') userName: string,
         @Arg('password') password: string
     ) {
         const saltHash = hashPassword(password)
         try {
-            const user = await getModelForClass(User).create({email: `${email}`, userName: `${userName}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
-            await getModelForClass(Category).create({categoryName: `${userName}'s Pantry`, userId: user._id});
+            const user = await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            await getModelForClass(Category).create({categoryName: 'Your Pantry', userId: user._id});
         } catch (err) {
             console.log(err);
             return {message: `${err}`, return: false}
