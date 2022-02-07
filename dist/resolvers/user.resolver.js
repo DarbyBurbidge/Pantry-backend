@@ -84,6 +84,17 @@ let UserResolver = class UserResolver {
         }
         return { message: "OK", return: true };
     }
+    async editUser(email, password, { payload }) {
+        const saltHash = (0, utils_1.hashPassword)(password);
+        try {
+            await (0, typegoose_1.getModelForClass)(user_model_1.User).findOneAndUpdate({ _id: payload === null || payload === void 0 ? void 0 : payload.userId }, { email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+        }
+        catch (err) {
+            console.log(err);
+            return { message: `${err}`, return: false };
+        }
+        return { message: "OK", return: true };
+    }
     async logout({ res }) {
         (0, auth_1.sendRefreshToken)(res, "");
         return { message: "OK", return: true };
@@ -136,6 +147,16 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('email')),
+    __param(1, (0, type_graphql_1.Arg)('password')),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "editUser", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     __param(0, (0, type_graphql_1.Ctx)()),

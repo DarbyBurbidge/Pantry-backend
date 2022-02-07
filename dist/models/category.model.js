@@ -27,7 +27,7 @@ __decorate([
 ], Category.prototype, "userId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true, unique: true }),
+    (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], Category.prototype, "categoryName", void 0);
 __decorate([
