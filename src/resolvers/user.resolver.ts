@@ -106,6 +106,27 @@ export class UserResolver {
         return {message: "OK", return: true}
     }
 
+
+    //Create a new User with client provided info
+    //return whether the User was created properly
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async editUser(    
+        @Arg('email') email: string,
+        @Arg('password') password: string,
+        @Ctx() {payload}: AppContext
+    ) {
+        const saltHash = hashPassword(password)
+        try {
+            await getModelForClass(User).findOneAndUpdate({_id: payload?.userId}, {email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+        } catch (err) {
+            console.log(err);
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+
     //Logout the user
     @Mutation(() => ReturnObject)
     async logout(
