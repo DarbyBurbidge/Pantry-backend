@@ -106,6 +106,31 @@ export class UserResolver {
         return {message: "OK", return: true}
     }
 
+    @Mutation(() => LoginResponse)
+    async registerAndLogin(
+        @Arg('email') email: string,
+        @Arg('password') password: string,
+        @Ctx() {res}: AppContext
+    ): Promise<LoginResponse> {
+        const saltHash = hashPassword(password)
+        try {
+            const user = await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            await getModelForClass(Category).create({categoryName: 'Your Pantry', userId: user._id});
+            //Login Successful
+            //create and send a RefreshToken cookie
+            sendRefreshToken(res, createRefreshToken(user));
+
+            //return a new AccessToken
+            return {
+                accessToken: createAccessToken(user),
+                user
+            }
+        } catch (err) {
+            console.log(err);
+            throw new Error(err)
+        }
+    }
+
 
     //Create a new User with client provided info
     //return whether the User was created properly
