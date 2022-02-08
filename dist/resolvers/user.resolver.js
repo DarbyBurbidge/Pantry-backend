@@ -84,6 +84,22 @@ let UserResolver = class UserResolver {
         }
         return { message: "OK", return: true };
     }
+    async registerAndLogin(email, password, { res }) {
+        const saltHash = (0, utils_1.hashPassword)(password);
+        try {
+            const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+            await (0, typegoose_1.getModelForClass)(category_model_1.Category).create({ categoryName: 'Your Pantry', userId: user._id });
+            (0, auth_1.sendRefreshToken)(res, (0, auth_1.createRefreshToken)(user));
+            return {
+                accessToken: (0, auth_1.createAccessToken)(user),
+                user
+            };
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(err);
+        }
+    }
     async editUser(email, password, { payload }) {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
@@ -147,6 +163,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => LoginResponse),
+    __param(0, (0, type_graphql_1.Arg)('email')),
+    __param(1, (0, type_graphql_1.Arg)('password')),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "registerAndLogin", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
