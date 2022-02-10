@@ -30,11 +30,12 @@ export class ItemResolver {
         @Arg('itemName') itemName: string,
         @Arg('categoryId') categoryId: string,
         @Arg('expiration') expiration: string,
+        @Arg('quantity') quantity: number,
         @Ctx() { payload }: AppContext
     ) {
         try {
             const date = generateDate(expiration)
-            await getModelForClass(Item).create({categoryId: categoryId, userId: payload?.userId, itemName: itemName, expiration: date})
+            await getModelForClass(Item).create({categoryId: categoryId, userId: payload?.userId, itemName: itemName, expiration: date, quantity: quantity})
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
@@ -48,11 +49,12 @@ export class ItemResolver {
         @Arg('_id') _id: string,
         @Arg('itemName') itemName: string,
         @Arg('expiration') expiration: string,
+        @Arg('quantity') quantity: number,
         @Ctx() { payload }: AppContext
     ) {
         try {
             const date = generateDate(expiration);
-            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: date})
+            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: date, quantity: quantity})
         } catch (err) {
             console.log(err)
             return {message: `${err}`, return: false}

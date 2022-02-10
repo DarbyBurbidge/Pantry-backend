@@ -18,4 +18,7 @@ export class Item {
 
     @Field() @prop({ required: true })
     expiration: string;
+
+    @Field() @prop({ required: true })
+    quantity: number;
 }

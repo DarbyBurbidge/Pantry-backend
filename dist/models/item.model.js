@@ -39,6 +39,11 @@ __decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], Item.prototype, "expiration", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Number)
+], Item.prototype, "quantity", void 0);
 Item = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], Item);

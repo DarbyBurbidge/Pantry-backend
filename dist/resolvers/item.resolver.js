@@ -32,10 +32,10 @@ let ItemResolver = class ItemResolver {
     async getItems() {
         return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find();
     }
-    async addItem(itemName, categoryId, expiration, { payload }) {
+    async addItem(itemName, categoryId, expiration, quantity, { payload }) {
         try {
             const date = generateDate(expiration);
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ categoryId: categoryId, userId: payload === null || payload === void 0 ? void 0 : payload.userId, itemName: itemName, expiration: date });
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ categoryId: categoryId, userId: payload === null || payload === void 0 ? void 0 : payload.userId, itemName: itemName, expiration: date, quantity: quantity });
         }
         catch (err) {
             console.error(err);
@@ -43,10 +43,10 @@ let ItemResolver = class ItemResolver {
         }
         return { message: "OK", return: true };
     }
-    async editItem(_id, itemName, expiration, { payload }) {
+    async editItem(_id, itemName, expiration, quantity, { payload }) {
         try {
             const date = generateDate(expiration);
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: _id, userId: payload === null || payload === void 0 ? void 0 : payload.userId }, { itemName: itemName, expiration: date });
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: _id, userId: payload === null || payload === void 0 ? void 0 : payload.userId }, { itemName: itemName, expiration: date, quantity: quantity });
         }
         catch (err) {
             console.log(err);
@@ -77,9 +77,10 @@ __decorate([
     __param(0, (0, type_graphql_1.Arg)('itemName')),
     __param(1, (0, type_graphql_1.Arg)('categoryId')),
     __param(2, (0, type_graphql_1.Arg)('expiration')),
-    __param(3, (0, type_graphql_1.Ctx)()),
+    __param(3, (0, type_graphql_1.Arg)('quantity')),
+    __param(4, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "addItem", null);
 __decorate([
@@ -88,9 +89,10 @@ __decorate([
     __param(0, (0, type_graphql_1.Arg)('_id')),
     __param(1, (0, type_graphql_1.Arg)('itemName')),
     __param(2, (0, type_graphql_1.Arg)('expiration')),
-    __param(3, (0, type_graphql_1.Ctx)()),
+    __param(3, (0, type_graphql_1.Arg)('quantity')),
+    __param(4, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "editItem", null);
 __decorate([
