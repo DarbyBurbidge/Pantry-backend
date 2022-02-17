@@ -8,9 +8,6 @@ export class Item {
     readonly _id: mongoose.Types.ObjectId;
 
     @Field() @prop({ required: true })
-    categoryId: string
-
-    @Field() @prop({ required: true })
     userId: string
 
     @Field() @prop({ required: true})
@@ -21,4 +18,7 @@ export class Item {
 
     @Field() @prop({ required: true })
     quantity: number;
+
+    @Field(() => [String]) @prop({ required: true })
+    tags: string[];
 }

@@ -8,8 +8,8 @@ import { isAuth } from "../middleware/isauth.middleware";
 import { User } from "../models/user.model";
 import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
 import { hashPassword, verifyPassword } from "../lib/utils";
-import { Category } from "../models/category.model";
 import { ReturnObject } from "./returnObject.resolver";
+import { Item } from "../models/item.model";
 
 @ObjectType()
 class LoginResponse {
@@ -97,8 +97,7 @@ export class UserResolver {
     ) {
         const saltHash = hashPassword(password)
         try {
-            const user = await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
-            await getModelForClass(Category).create({categoryName: 'Your Pantry', userId: user._id});
+            await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
         } catch (err) {
             console.log(err);
             return {message: `${err}`, return: false}
@@ -115,8 +114,6 @@ export class UserResolver {
         const saltHash = hashPassword(password)
         try {
             const user = await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
-            await getModelForClass(Category).create({categoryName: 'Your Pantry', userId: user._id});
-            //Login Successful
             //create and send a RefreshToken cookie
             sendRefreshToken(res, createRefreshToken(user));
 
@@ -162,12 +159,12 @@ export class UserResolver {
         }
 
     
-    @FieldResolver(() => [Category])
-    async categories(
+    @FieldResolver(() => [Item])
+    async items(
         @Root() user : any
     ) {
         try {
-            return await getModelForClass(Category).find({userId: user?._id})
+            return await getModelForClass(Item).find({userId: user?._id})
         } catch (err) {
             console.log(err)
             throw new Error(err)
