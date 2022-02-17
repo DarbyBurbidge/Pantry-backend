@@ -1,6 +1,6 @@
 import { mongoose, prop } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
-import { Category } from "./category.model";
+import { Item } from "./item.model";
 
 @ObjectType()
 export class User {
@@ -17,9 +17,12 @@ export class User {
     @prop({ required: true })
     pw_hash: string;
 
-    @Field() @prop({ default: 0})
+    @Field() @prop({ default: 0 })
     tokenVersion: number;
 
-    @Field(() => [Category])
-    categories: [Category];
+    @Field(() => [Item], { nullable: true })
+    items: [Item];
+
+    @Field(() => [String]) @prop({ required: false })
+    tags: string[];
 }

@@ -20,8 +20,8 @@ const isauth_middleware_1 = require("../middleware/isauth.middleware");
 const user_model_1 = require("../models/user.model");
 const auth_1 = require("../lib/auth");
 const utils_1 = require("../lib/utils");
-const category_model_1 = require("../models/category.model");
 const returnObject_resolver_1 = require("./returnObject.resolver");
+const item_model_1 = require("../models/item.model");
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -75,8 +75,7 @@ let UserResolver = class UserResolver {
     async register(email, password) {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
-            const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
-            await (0, typegoose_1.getModelForClass)(category_model_1.Category).create({ categoryName: 'Your Pantry', userId: user._id });
+            await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
         }
         catch (err) {
             console.log(err);
@@ -88,7 +87,6 @@ let UserResolver = class UserResolver {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
             const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
-            await (0, typegoose_1.getModelForClass)(category_model_1.Category).create({ categoryName: 'Your Pantry', userId: user._id });
             (0, auth_1.sendRefreshToken)(res, (0, auth_1.createRefreshToken)(user));
             return {
                 accessToken: (0, auth_1.createAccessToken)(user),
@@ -115,9 +113,9 @@ let UserResolver = class UserResolver {
         (0, auth_1.sendRefreshToken)(res, "");
         return { message: "OK", return: true };
     }
-    async categories(user) {
+    async items(user) {
         try {
-            return await (0, typegoose_1.getModelForClass)(category_model_1.Category).find({ userId: user === null || user === void 0 ? void 0 : user._id });
+            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find({ userId: user === null || user === void 0 ? void 0 : user._id });
         }
         catch (err) {
             console.log(err);
@@ -190,12 +188,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "logout", null);
 __decorate([
-    (0, type_graphql_1.FieldResolver)(() => [category_model_1.Category]),
+    (0, type_graphql_1.FieldResolver)(() => [item_model_1.Item]),
     __param(0, (0, type_graphql_1.Root)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "categories", null);
+], UserResolver.prototype, "items", null);
 UserResolver = __decorate([
     (0, type_graphql_1.Resolver)(user_model_1.User)
 ], UserResolver);

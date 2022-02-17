@@ -17,7 +17,7 @@ const generateDate = (date: string) => {
     return `${month}/${day}/${year}`
 }
 
-@Resolver()
+@Resolver(Item)
 export class ItemResolver {
     @Query(() => [Item], { nullable: true })
     async getItems() {
@@ -28,14 +28,14 @@ export class ItemResolver {
     @UseMiddleware(isAuth)
     async addItem(
         @Arg('itemName') itemName: string,
-        @Arg('categoryId') categoryId: string,
         @Arg('expiration') expiration: string,
         @Arg('quantity') quantity: number,
+        @Arg('tags', () => [String]) tags: string[],
         @Ctx() { payload }: AppContext
     ) {
         try {
             const date = generateDate(expiration)
-            await getModelForClass(Item).create({categoryId: categoryId, userId: payload?.userId, itemName: itemName, expiration: date, quantity: quantity})
+            await getModelForClass(Item).create({userId: payload?.userId, itemName: itemName, expiration: date, quantity: quantity, tags: tags})
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
