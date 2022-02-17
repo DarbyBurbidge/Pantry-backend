@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
-const category_model_1 = require("./category.model");
+const item_model_1 = require("./item.model");
 let User = class User {
 };
 __decorate([
@@ -39,9 +39,14 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "tokenVersion", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [category_model_1.Category]),
+    (0, type_graphql_1.Field)(() => [item_model_1.Item], { nullable: true }),
     __metadata("design:type", Array)
-], User.prototype, "categories", void 0);
+], User.prototype, "items", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [String]),
+    (0, typegoose_1.prop)({ required: false }),
+    __metadata("design:type", Array)
+], User.prototype, "tags", void 0);
 User = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], User);

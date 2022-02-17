@@ -23,11 +23,6 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
-], Item.prototype, "categoryId", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
-    __metadata("design:type", String)
 ], Item.prototype, "userId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
@@ -44,6 +39,11 @@ __decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", Number)
 ], Item.prototype, "quantity", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [String]),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Array)
+], Item.prototype, "tags", void 0);
 Item = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], Item);

@@ -32,10 +32,10 @@ let ItemResolver = class ItemResolver {
     async getItems() {
         return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find();
     }
-    async addItem(itemName, categoryId, expiration, quantity, { payload }) {
+    async addItem(itemName, expiration, quantity, tags, { payload }) {
         try {
             const date = generateDate(expiration);
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ categoryId: categoryId, userId: payload === null || payload === void 0 ? void 0 : payload.userId, itemName: itemName, expiration: date, quantity: quantity });
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ userId: payload === null || payload === void 0 ? void 0 : payload.userId, itemName: itemName, expiration: date, quantity: quantity, tags: tags });
         }
         catch (err) {
             console.error(err);
@@ -75,12 +75,12 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
     __param(0, (0, type_graphql_1.Arg)('itemName')),
-    __param(1, (0, type_graphql_1.Arg)('categoryId')),
-    __param(2, (0, type_graphql_1.Arg)('expiration')),
-    __param(3, (0, type_graphql_1.Arg)('quantity')),
+    __param(1, (0, type_graphql_1.Arg)('expiration')),
+    __param(2, (0, type_graphql_1.Arg)('quantity')),
+    __param(3, (0, type_graphql_1.Arg)('tags', () => [String])),
     __param(4, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Number, Object]),
+    __metadata("design:paramtypes", [String, String, Number, Array, Object]),
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "addItem", null);
 __decorate([
@@ -104,7 +104,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "deleteItem", null);
 ItemResolver = __decorate([
-    (0, type_graphql_1.Resolver)()
+    (0, type_graphql_1.Resolver)(item_model_1.Item)
 ], ItemResolver);
 exports.ItemResolver = ItemResolver;
 //# sourceMappingURL=item.resolver.js.map
