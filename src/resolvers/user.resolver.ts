@@ -6,10 +6,12 @@ import { verify } from "jsonwebtoken";
 import { AppContext } from "../context/app.context";
 import { isAuth } from "../middleware/isauth.middleware";
 import { User } from "../models/user.model";
+import { Item } from "../models/item.model";
+import { ShoppingList } from "../models/shoppingList.model";
 import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
 import { hashPassword, verifyPassword } from "../lib/utils";
 import { ReturnObject } from "./returnObject.resolver";
-import { Item } from "../models/item.model";
+
 
 @ObjectType()
 class LoginResponse {
@@ -164,7 +166,20 @@ export class UserResolver {
         @Root() user : any
     ) {
         try {
-            return await getModelForClass(Item).find({userId: user?._id})
+            return await getModelForClass(Item).find({ _id: {$in: user.itemIds }})
+        } catch (err) {
+            console.log(err)
+            throw new Error(err)
+        }
+    }
+
+
+    @FieldResolver(() => ShoppingList)
+    async shoppingList(
+        @Root() user : any
+    ) {
+        try {
+            return await getModelForClass(ShoppingList).findById(user.shoppingListId)
         } catch (err) {
             console.log(err)
             throw new Error(err)

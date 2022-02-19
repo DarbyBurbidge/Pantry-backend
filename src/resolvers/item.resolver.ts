@@ -4,18 +4,11 @@ import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql
 import { AppContext } from "../context/app.context";
 import { isAuth } from "../middleware/isauth.middleware";
 import { ReturnObject } from "./returnObject.resolver";
+import { User } from "../models/user.model";
+import { generateDate } from "../lib/utils";
 
 
-const generateDate = (date: string) => {
-    if (date == 'N/A') {
-        return date
-    }
-    const seperated = date.split('-')
-    const day = parseInt(seperated[2])
-    const month = parseInt(seperated[1])
-    const year = seperated[0].substring(seperated.length - 1);
-    return `${month}/${day}/${year}`
-}
+
 
 @Resolver(Item)
 export class ItemResolver {
@@ -33,9 +26,10 @@ export class ItemResolver {
         @Arg('tags', () => [String]) tags: string[],
         @Ctx() { payload }: AppContext
     ) {
-        try {
+        try { 
             const date = generateDate(expiration)
-            await getModelForClass(Item).create({userId: payload?.userId, itemName: itemName, expiration: date, quantity: quantity, tags: tags})
+            const item = await getModelForClass(Item).create({itemName: itemName, expiration: date, quantity: quantity, tags: tags})
+            await getModelForClass(User).findByIdAndUpdate(payload?.userId,{ $addToSet: {itemIds: item._id}})
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}

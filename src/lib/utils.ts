@@ -23,3 +23,14 @@ export const hashPassword = (password: string) => {
         hash: genHash
     };
 }
+
+export const generateDate = (date: string) => {
+    if (date == 'N/A') {
+        return date
+    }
+    const seperated = date.split('-')
+    const day = parseInt(seperated[2])
+    const month = parseInt(seperated[1])
+    const year = seperated[0].substring(seperated.length - 1);
+    return `${month}/${day}/${year}`
+}
