@@ -13,7 +13,7 @@ export class Item {
     @Field() @prop({ required: true })
     expiration: string;
 
-    @Field() @prop({ required: true })
+    @Field() @prop({type: Number, required: true })
     quantity: number;
 
     @Field(() => [String]) @prop({ required: true })
