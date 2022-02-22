@@ -18,10 +18,11 @@ const typegoose_1 = require("@typegoose/typegoose");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const isauth_middleware_1 = require("../middleware/isauth.middleware");
 const user_model_1 = require("../models/user.model");
+const item_model_1 = require("../models/item.model");
+const shoppingList_model_1 = require("../models/shoppingList.model");
 const auth_1 = require("../lib/auth");
 const utils_1 = require("../lib/utils");
 const returnObject_resolver_1 = require("./returnObject.resolver");
-const item_model_1 = require("../models/item.model");
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -115,7 +116,16 @@ let UserResolver = class UserResolver {
     }
     async items(user) {
         try {
-            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find({ userId: user === null || user === void 0 ? void 0 : user._id });
+            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find({ _id: { $in: user.itemIds } });
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(err);
+        }
+    }
+    async shoppingList(user) {
+        try {
+            return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findById(user.shoppingListId);
         }
         catch (err) {
             console.log(err);
@@ -194,6 +204,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "items", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => shoppingList_model_1.ShoppingList),
+    __param(0, (0, type_graphql_1.Root)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "shoppingList", null);
 UserResolver = __decorate([
     (0, type_graphql_1.Resolver)(user_model_1.User)
 ], UserResolver);

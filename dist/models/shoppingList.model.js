@@ -9,54 +9,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.ShoppingList = void 0;
 const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
 const item_model_1 = require("./item.model");
-const shoppingList_model_1 = require("../models/shoppingList.model");
-let User = class User {
+let ShoppingList = class ShoppingList {
 };
 __decorate([
     (0, type_graphql_1.Field)(() => type_graphql_1.ID),
     (0, typegoose_1.prop)({ auto: true }),
     __metadata("design:type", typegoose_1.mongoose.Types.ObjectId)
-], User.prototype, "_id", void 0);
+], ShoppingList.prototype, "_id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true, unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
+    (0, type_graphql_1.Field)(() => [String]),
     (0, typegoose_1.prop)({ required: true }),
-    __metadata("design:type", String)
-], User.prototype, "salt", void 0);
-__decorate([
-    (0, typegoose_1.prop)({ required: true }),
-    __metadata("design:type", String)
-], User.prototype, "pw_hash", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ default: 0 }),
-    __metadata("design:type", Number)
-], User.prototype, "tokenVersion", void 0);
-__decorate([
-    (0, typegoose_1.prop)(),
     __metadata("design:type", Array)
-], User.prototype, "itemIds", void 0);
+], ShoppingList.prototype, "itemIds", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => [item_model_1.Item], { nullable: true }),
     __metadata("design:type", Array)
-], User.prototype, "items", void 0);
-__decorate([
-    (0, typegoose_1.prop)(),
-    __metadata("design:type", String)
-], User.prototype, "shoppingListId", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => shoppingList_model_1.ShoppingList, { nullable: true }),
-    __metadata("design:type", shoppingList_model_1.ShoppingList)
-], User.prototype, "shoppingList", void 0);
-User = __decorate([
+], ShoppingList.prototype, "items", void 0);
+ShoppingList = __decorate([
     (0, type_graphql_1.ObjectType)()
-], User);
-exports.User = User;
-//# sourceMappingURL=user.model.js.map
+], ShoppingList);
+exports.ShoppingList = ShoppingList;
+//# sourceMappingURL=shoppingList.model.js.map

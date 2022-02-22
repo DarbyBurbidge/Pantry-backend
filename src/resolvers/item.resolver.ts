@@ -62,6 +62,7 @@ export class ItemResolver {
         @Arg('_id') _id: string,
     ) {
         try {
+            await getModelForClass(User).findOneAndUpdate({$in: {itemIds: _id}}, {$pull: {itemIds: _id}})
             await getModelForClass(Item).findByIdAndDelete(_id)
         } catch (err) {
             console.error(err)

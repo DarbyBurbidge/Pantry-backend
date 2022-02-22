@@ -11,6 +11,7 @@ const type_graphql_1 = require("type-graphql");
 const server_1 = __importDefault(require("./server"));
 const user_resolver_1 = require("./resolvers/user.resolver");
 const item_resolver_1 = require("./resolvers/item.resolver");
+const shoppingList_resolver_1 = require("./resolvers/shoppingList.resolver");
 dotenv_1.default.config();
 mongoose_1.default.connect(`${process.env.DB_URI}`, async (err) => {
     if (err) {
@@ -26,7 +27,7 @@ db.once('open', async () => {
 (async () => {
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [user_resolver_1.UserResolver, item_resolver_1.ItemResolver]
+            resolvers: [user_resolver_1.UserResolver, item_resolver_1.ItemResolver, shoppingList_resolver_1.ShoppingListResolver]
         }),
         context: ({ req, res }) => ({ req, res })
     });

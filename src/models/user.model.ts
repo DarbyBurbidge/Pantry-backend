@@ -24,7 +24,7 @@ export class User {
     tokenVersion: number;
 
     // Related Document information
-    @prop()
+    @ Field(() => [String]) @prop()
     itemIds: string[]
 
     @Field(() => [Item], { nullable: true })
