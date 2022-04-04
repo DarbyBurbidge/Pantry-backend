@@ -19,6 +19,6 @@ export class Item {
     @Field(() => [String]) @prop({ required: true })
     tags: string[];
 
-    @Field(() => Boolean) @prop({ default: false })
-    favorite: boolean
+    @Field() @prop({ default: false })
+    favorite: boolean;
 }

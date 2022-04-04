@@ -12,7 +12,7 @@ import { createAccessToken, createRefreshToken, sendRefreshToken } from "./lib/a
 const app = express();
 
 app.use(cors({
-    origin: ['https://www.thedarby.rocks', 'http://localhost:3000'],
+    origin: ['https://www.thedarby.rocks', 'http://localhost:3000', 'https://24.21.76.229:3000'],
     credentials: true
 }));
 app.use(cookieParser());
