@@ -18,24 +18,17 @@ const item_model_1 = require("../models/item.model");
 const type_graphql_1 = require("type-graphql");
 const isauth_middleware_1 = require("../middleware/isauth.middleware");
 const returnObject_resolver_1 = require("./returnObject.resolver");
-const generateDate = (date) => {
-    if (date == 'N/A') {
-        return date;
-    }
-    const seperated = date.split('-');
-    const day = parseInt(seperated[2]);
-    const month = parseInt(seperated[1]);
-    const year = seperated[0].substring(seperated.length - 1);
-    return `${month}/${day}/${year}`;
-};
+const user_model_1 = require("../models/user.model");
+const utils_1 = require("../lib/utils");
 let ItemResolver = class ItemResolver {
     async getItems() {
         return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find();
     }
     async addItem(itemName, expiration, quantity, tags, { payload }) {
         try {
-            const date = generateDate(expiration);
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ userId: payload === null || payload === void 0 ? void 0 : payload.userId, itemName: itemName, expiration: date, quantity: quantity, tags: tags });
+            const date = (0, utils_1.generateDate)(expiration);
+            const item = await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ itemName: itemName, expiration: date, quantity: quantity, tags: tags });
+            await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { $addToSet: { itemIds: item._id } });
         }
         catch (err) {
             console.error(err);
@@ -45,7 +38,7 @@ let ItemResolver = class ItemResolver {
     }
     async editItem(_id, itemName, expiration, quantity, { payload }) {
         try {
-            const date = generateDate(expiration);
+            const date = (0, utils_1.generateDate)(expiration);
             await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: _id, userId: payload === null || payload === void 0 ? void 0 : payload.userId }, { itemName: itemName, expiration: date, quantity: quantity });
         }
         catch (err) {

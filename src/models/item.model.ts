@@ -7,18 +7,18 @@ export class Item {
     @Field(() => ID) @prop({ auto: true })
     readonly _id: mongoose.Types.ObjectId;
 
-    @Field() @prop({ required: true })
-    userId: string
-
     @Field() @prop({ required: true})
     itemName: string;
 
     @Field() @prop({ required: true })
     expiration: string;
 
-    @Field() @prop({ required: true })
+    @Field() @prop({type: Number, required: true })
     quantity: number;
 
     @Field(() => [String]) @prop({ required: true })
     tags: string[];
+
+    @Field() @prop({ default: false })
+    favorite: boolean
 }

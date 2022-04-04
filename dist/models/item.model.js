@@ -23,11 +23,6 @@ __decorate([
     (0, type_graphql_1.Field)(),
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
-], Item.prototype, "userId", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
-    __metadata("design:type", String)
 ], Item.prototype, "itemName", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),

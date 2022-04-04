@@ -4,18 +4,11 @@ import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql
 import { AppContext } from "../context/app.context";
 import { isAuth } from "../middleware/isauth.middleware";
 import { ReturnObject } from "./returnObject.resolver";
+import { generateDate } from "../lib/utils";
+import { User } from "../models/user.model";
+import { ShoppingList } from "../models/shoppingList.model";
 
 
-const generateDate = (date: string) => {
-    if (date == 'N/A') {
-        return date
-    }
-    const seperated = date.split('-')
-    const day = parseInt(seperated[2])
-    const month = parseInt(seperated[1])
-    const year = seperated[0].substring(seperated.length - 1);
-    return `${month}/${day}/${year}`
-}
 
 @Resolver(Item)
 export class ItemResolver {
@@ -24,6 +17,9 @@ export class ItemResolver {
         return await getModelForClass(Item).find()
     }
 
+    /* ADD ITEM */
+
+    // Add to User
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async addItem(
@@ -31,11 +27,14 @@ export class ItemResolver {
         @Arg('expiration') expiration: string,
         @Arg('quantity') quantity: number,
         @Arg('tags', () => [String]) tags: string[],
+        @Arg('parentType') parentType: string,
         @Ctx() { payload }: AppContext
     ) {
-        try {
-            const date = generateDate(expiration)
-            await getModelForClass(Item).create({userId: payload?.userId, itemName: itemName, expiration: date, quantity: quantity, tags: tags})
+        try { 
+            const date = generateDate(expiration);
+            const item = await getModelForClass(Item).create({itemName: itemName, expiration: date, quantity: quantity, tags: tags});
+            parentType === "user" ? await getModelForClass(User).findByIdAndUpdate(payload?.userId, { $addToSet: {itemIds: item.id}}) : null;
+            parentType === "list" ? await getModelForClass(ShoppingList).findByIdAndUpdate(payload?.listId, { $addToSet: {itemIds: item.id}}) : null;
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
@@ -43,10 +42,31 @@ export class ItemResolver {
         return {message: "OK", return: true}
     }
 
+
+    /* Delete Item */
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async deleteItem(
+        @Arg('id') id: string,
+        @Arg('parentType') parentType: string,
+    ) {
+        try {
+            parentType === "user" ? await getModelForClass(User).findOneAndUpdate({$in: {itemIds: id}}, {$pull: {itemIds: id}}) : null;
+            parentType === "list" ?  await getModelForClass(ShoppingList).findOneAndUpdate({$in: {itemIds: id}}, {$pull: {itemIds: id}}): null;
+            await getModelForClass(Item).findByIdAndDelete(id);
+        } catch (err) {
+            console.error(err)
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+
+    /* EDIT ITEM */
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async editItem(
-        @Arg('_id') _id: string,
+        @Arg('id') id: string,
         @Arg('itemName') itemName: string,
         @Arg('expiration') expiration: string,
         @Arg('quantity') quantity: number,
@@ -54,7 +74,7 @@ export class ItemResolver {
     ) {
         try {
             const date = generateDate(expiration);
-            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: date, quantity: quantity})
+            await getModelForClass(Item).findOneAndUpdate({_id: id, userId: payload?.userId}, {itemName: itemName, expiration: date, quantity: quantity})
         } catch (err) {
             console.log(err)
             return {message: `${err}`, return: false}
@@ -64,16 +84,15 @@ export class ItemResolver {
 
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
-    async deleteItem(
-        @Arg('_id') _id: string,
+    async toggleFavorite(
+        @Arg('id') id: string
     ) {
         try {
-            await getModelForClass(Item).findByIdAndDelete(_id)
+            await getModelForClass(Item).findOneAndUpdate({_id: id}, [{$set:{favorite:{$eq:[false,"$favorite"]}}}]);
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
         }
         return {message: "OK", return: true}
     }
-
 }

@@ -1,10 +1,13 @@
 import { mongoose, prop } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
 import { Item } from "./item.model";
+import { ShoppingList } from "../models/shoppingList.model";
+
 
 @ObjectType()
 export class User {
 
+    // User Document Information
     @Field(() => ID) @prop({ auto: true })
     readonly _id: mongoose.Types.ObjectId;
 
@@ -20,9 +23,16 @@ export class User {
     @Field() @prop({ default: 0 })
     tokenVersion: number;
 
+    // Related Document information
+    @ Field(() => [String]) @prop()
+    itemIds: string[]
+
     @Field(() => [Item], { nullable: true })
     items: [Item];
 
-    @Field(() => [String]) @prop({ required: false })
-    tags: string[];
+    @prop()
+    shoppingListId: string | null;
+
+    @Field(() => ShoppingList, { nullable: true})
+    shoppingList: ShoppingList;
 }

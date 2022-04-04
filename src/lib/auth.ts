@@ -1,10 +1,10 @@
-import { User } from "../models/user.model";
 import { sign } from "jsonwebtoken";
 import { Response } from "express";
+import { User } from "../models/user.model";
 
 
 export const createAccessToken = (user: User) => {
-    return sign({ userId: user._id.toString()}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: "15m", algorithm: 'ES512'});
+    return sign({ userId: user._id.toString(), listId: user.shoppingListId}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: "15m", algorithm: 'ES512'});
 };
 
 export const createRefreshToken = (user: User) => {
