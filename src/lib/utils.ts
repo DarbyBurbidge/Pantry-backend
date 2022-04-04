@@ -65,7 +65,7 @@ export const addToParent: ObjectLiteral = {
             await getModelForClass(User).findByIdAndUpdate(parentId, { $addToSet: { itemIds: _id } });
         } catch (err) {
             console.error(err)
-            throw new Error(err)
+            //throw new Error(err)
         }
     },
     'list': async (parentId: string, _id: string) => {
@@ -73,7 +73,7 @@ export const addToParent: ObjectLiteral = {
             await getModelForClass(ShoppingList).findByIdAndUpdate(parentId, { $addToSet: { itemIds: _id } });
         } catch (err) {
             console.error(err);
-            throw new Error(err)
+            //throw new Error(err)
         }
     },
     'default': () => {

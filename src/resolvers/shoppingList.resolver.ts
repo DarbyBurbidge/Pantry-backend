@@ -1,16 +1,24 @@
 import { getModelForClass, mongoose } from "@typegoose/typegoose";
 import { AppContext } from "../context/app.context";
-import { Arg, Ctx, FieldResolver, Mutation, Resolver, Root, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import { Item } from "../models/item.model";
 import { ShoppingList } from "../models/shoppingList.model";
 import { ReturnObject } from "./returnObject.resolver";
 import { isAuth } from "../middleware/isauth.middleware";
 import { User } from "../models/user.model";
-import { generateDate } from "../lib/utils";
 
 
 @Resolver(ShoppingList)
 export class ShoppingListResolver {
+
+    @Query(() => ShoppingList, { nullable: true }) 
+    @UseMiddleware(isAuth)
+    async getShoppingList(
+        @Ctx() { payload }: AppContext
+    ) {
+        const user = await getModelForClass(User).findById({_id: payload?.userId});
+        return await getModelForClass(ShoppingList).findById({_id: user?.shoppingListId});
+    }
 
     // List Management Mutations
     @Mutation(() => ReturnObject)
@@ -19,10 +27,10 @@ export class ShoppingListResolver {
         @Ctx() { payload }: AppContext
     ) {
         try {
-            const shoppingList = await getModelForClass(ShoppingList).create({ itemIds: [] })
-            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id })
+            const shoppingList = await getModelForClass(ShoppingList).create({ itemIds: [] });
+            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id });
         } catch (err) {
-            console.error(err)
+            console.error(err);
             return { message: `${err}`, return: false }
         }
         return { message: "OK", return: true }
@@ -31,54 +39,18 @@ export class ShoppingListResolver {
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async deleteShoppingList(
-        @Arg('shoppingListId') shoppingListId: string,
+        @Arg('id') id: string,
         @Ctx() { payload }: AppContext
     ) {
         try {
-            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId })
-            await getModelForClass(ShoppingList).findByIdAndDelete(shoppingListId)
+            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { id });
+            await getModelForClass(ShoppingList).findByIdAndDelete(id);
         } catch (err) {
-            console.error(err)
+            console.error(err);
             return { message: `${err}`, return: false }
         }
         return { message: "OK", return: true }
 
-    }
-
-    // Related Document Mutations
-    @Mutation(() => ReturnObject)
-    @UseMiddleware(isAuth)
-    async addListItem(
-        @Arg('itemName') itemName: string,
-        @Arg('expiration') expiration: string,
-        @Arg('quantity') quantity: number,
-        @Arg('tags', () => [String]) tags: string[],
-        @Arg('listId') listId: string
-    ) {
-        try {
-            const date = generateDate(expiration)
-            const item = await getModelForClass(Item).create({ itemName: itemName, expiration: date, quantity: quantity, tags: tags })
-            await getModelForClass(ShoppingList).findByIdAndUpdate(listId, { $addToSet: { itemIds: item._id } })
-        } catch (err) {
-            console.error(err)
-            return { message: `${err}`, return: false }
-        }
-        return { message: "OK", return: true }
-    }
-
-    @Mutation(() => ReturnObject)
-    @UseMiddleware(isAuth)
-    async deleteListItem(
-        @Arg('_id') _id: string,
-    ) {
-        try {
-            await getModelForClass(ShoppingList).findOneAndUpdate({ $in: { itemIds: _id } }, { $pull: { itemIds: _id } })
-            await getModelForClass(Item).findByIdAndDelete(_id)
-        } catch (err) {
-            console.error(err)
-            return { message: `${err}`, return: false }
-        }
-        return { message: "OK", return: true }
     }
 
     @Mutation(() => ReturnObject)
@@ -93,10 +65,10 @@ export class ShoppingListResolver {
             const UserDoc = getModelForClass(User);
             const listItems = await ItemDoc.find({ _id: { $in: itemIds.map((id: string) => { return new mongoose.Types.ObjectId(id) }) } });
             const user = await UserDoc.findById(payload?.userId);
-            const userItemIds = user?.itemIds
+            const userItemIds = user?.itemIds;
             const userItems = await ItemDoc.find({ _id: { $in: userItemIds?.map((id: string) => { return new mongoose.Types.ObjectId(id) }) } });
             let conflictingItems: { userItem: Item, listItem: Item }[] = [];
-            let newItemIds: string[] = []
+            let newItemIds: string[] = [];
 
 
             // Checks if any listItem has a conflict
@@ -132,7 +104,8 @@ export class ShoppingListResolver {
                     _id: conflictingItem.userItem._id
                 }, {
                     quantity: conflictingItem.userItem.quantity + conflictingItem.listItem.quantity,
-                    tags: [...new Set(conflictingItem.userItem.tags.concat(conflictingItem.listItem.tags))]
+                    tags: [...new Set(conflictingItem.userItem.tags.concat(conflictingItem.listItem.tags))],
+                    favorite: conflictingItem.userItem.favorite || conflictingItem.listItem.favorite
                 });
                 await ItemDoc.findByIdAndDelete(conflictingItem.listItem._id);
             });

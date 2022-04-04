@@ -8,7 +8,6 @@ import { addToParent, deleteFromParent, generateDate } from "../lib/utils";
 
 
 
-
 @Resolver(Item)
 export class ItemResolver {
     @Query(() => [Item], { nullable: true })
@@ -107,7 +106,7 @@ export class ItemResolver {
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async editItem(
-        @Arg('_id') _id: string,
+        @Arg('id') id: string,
         @Arg('itemName') itemName: string,
         @Arg('expiration') expiration: string,
         @Arg('quantity') quantity: number,
@@ -115,9 +114,23 @@ export class ItemResolver {
     ) {
         try {
             const date = generateDate(expiration);
-            await getModelForClass(Item).findOneAndUpdate({_id: _id, userId: payload?.userId}, {itemName: itemName, expiration: date, quantity: quantity})
+            await getModelForClass(Item).findOneAndUpdate({_id: id, userId: payload?.userId}, {itemName: itemName, expiration: date, quantity: quantity})
         } catch (err) {
             console.log(err)
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async toggleFavorite(
+        @Arg('id') id: string
+    ) {
+        try {
+            await getModelForClass(Item).findOneAndUpdate({_id: id}, [{$set:{favorite:{$eq:[false,"$favorite"]}}}]);
+        } catch (err) {
+            console.error(err)
             return {message: `${err}`, return: false}
         }
         return {message: "OK", return: true}
