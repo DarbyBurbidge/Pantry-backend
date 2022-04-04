@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendRefreshToken = exports.createRefreshToken = exports.createAccessToken = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
 const createAccessToken = (user) => {
-    return (0, jsonwebtoken_1.sign)({ userId: user._id.toString() }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m", algorithm: 'ES512' });
+    return (0, jsonwebtoken_1.sign)({ userId: user._id.toString(), listId: user.shoppingListId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m", algorithm: 'ES512' });
 };
 exports.createAccessToken = createAccessToken;
 const createRefreshToken = (user) => {

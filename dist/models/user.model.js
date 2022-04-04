@@ -40,6 +40,7 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "tokenVersion", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(() => [String]),
     (0, typegoose_1.prop)(),
     __metadata("design:type", Array)
 ], User.prototype, "itemIds", void 0);
@@ -49,7 +50,7 @@ __decorate([
 ], User.prototype, "items", void 0);
 __decorate([
     (0, typegoose_1.prop)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], User.prototype, "shoppingListId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => shoppingList_model_1.ShoppingList, { nullable: true }),
