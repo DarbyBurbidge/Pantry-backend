@@ -18,17 +18,19 @@ const item_model_1 = require("../models/item.model");
 const type_graphql_1 = require("type-graphql");
 const isauth_middleware_1 = require("../middleware/isauth.middleware");
 const returnObject_resolver_1 = require("./returnObject.resolver");
-const user_model_1 = require("../models/user.model");
 const utils_1 = require("../lib/utils");
+const user_model_1 = require("../models/user.model");
+const shoppingList_model_1 = require("../models/shoppingList.model");
 let ItemResolver = class ItemResolver {
     async getItems() {
         return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find();
     }
-    async addItem(itemName, expiration, quantity, tags, { payload }) {
+    async addItem(itemName, expiration, quantity, tags, parentType, { payload }) {
         try {
             const date = (0, utils_1.generateDate)(expiration);
             const item = await (0, typegoose_1.getModelForClass)(item_model_1.Item).create({ itemName: itemName, expiration: date, quantity: quantity, tags: tags });
-            await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { $addToSet: { itemIds: item._id } });
+            parentType === "user" ? await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { $addToSet: { itemIds: item.id } }) : null;
+            parentType === "list" ? await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.listId, { $addToSet: { itemIds: item.id } }) : null;
         }
         catch (err) {
             console.error(err);
@@ -36,10 +38,22 @@ let ItemResolver = class ItemResolver {
         }
         return { message: "OK", return: true };
     }
-    async editItem(_id, itemName, expiration, quantity, { payload }) {
+    async deleteItem(id, parentType) {
+        try {
+            parentType === "user" ? await (0, typegoose_1.getModelForClass)(user_model_1.User).findOneAndUpdate({ $in: { itemIds: id } }, { $pull: { itemIds: id } }) : null;
+            parentType === "list" ? await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findOneAndUpdate({ $in: { itemIds: id } }, { $pull: { itemIds: id } }) : null;
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findByIdAndDelete(id);
+        }
+        catch (err) {
+            console.error(err);
+            return { message: `${err}`, return: false };
+        }
+        return { message: "OK", return: true };
+    }
+    async editItem(id, itemName, expiration, quantity, { payload }) {
         try {
             const date = (0, utils_1.generateDate)(expiration);
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: _id, userId: payload === null || payload === void 0 ? void 0 : payload.userId }, { itemName: itemName, expiration: date, quantity: quantity });
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id, userId: payload === null || payload === void 0 ? void 0 : payload.userId }, { itemName: itemName, expiration: date, quantity: quantity });
         }
         catch (err) {
             console.log(err);
@@ -47,9 +61,9 @@ let ItemResolver = class ItemResolver {
         }
         return { message: "OK", return: true };
     }
-    async deleteItem(_id) {
+    async toggleFavorite(id) {
         try {
-            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findByIdAndDelete(_id);
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, [{ $set: { favorite: { $eq: [false, "$favorite"] } } }]);
         }
         catch (err) {
             console.error(err);
@@ -71,15 +85,25 @@ __decorate([
     __param(1, (0, type_graphql_1.Arg)('expiration')),
     __param(2, (0, type_graphql_1.Arg)('quantity')),
     __param(3, (0, type_graphql_1.Arg)('tags', () => [String])),
-    __param(4, (0, type_graphql_1.Ctx)()),
+    __param(4, (0, type_graphql_1.Arg)('parentType')),
+    __param(5, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Number, Array, Object]),
+    __metadata("design:paramtypes", [String, String, Number, Array, String, Object]),
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "addItem", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Arg)('_id')),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('parentType')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ItemResolver.prototype, "deleteItem", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id')),
     __param(1, (0, type_graphql_1.Arg)('itemName')),
     __param(2, (0, type_graphql_1.Arg)('expiration')),
     __param(3, (0, type_graphql_1.Arg)('quantity')),
@@ -91,11 +115,11 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Arg)('_id')),
+    __param(0, (0, type_graphql_1.Arg)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], ItemResolver.prototype, "deleteItem", null);
+], ItemResolver.prototype, "toggleFavorite", null);
 ItemResolver = __decorate([
     (0, type_graphql_1.Resolver)(item_model_1.Item)
 ], ItemResolver);

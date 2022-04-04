@@ -31,7 +31,7 @@ __decorate([
 ], Item.prototype, "expiration", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
+    (0, typegoose_1.prop)({ type: Number, required: true }),
     __metadata("design:type", Number)
 ], Item.prototype, "quantity", void 0);
 __decorate([
@@ -39,6 +39,11 @@ __decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", Array)
 ], Item.prototype, "tags", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typegoose_1.prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Item.prototype, "favorite", void 0);
 Item = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], Item);
