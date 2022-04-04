@@ -31,7 +31,7 @@ export class User {
     items: [Item];
 
     @prop()
-    shoppingListId: string;
+    shoppingListId: string | null;
 
     @Field(() => ShoppingList, { nullable: true})
     shoppingList: ShoppingList;

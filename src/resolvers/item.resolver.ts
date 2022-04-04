@@ -4,7 +4,9 @@ import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql
 import { AppContext } from "../context/app.context";
 import { isAuth } from "../middleware/isauth.middleware";
 import { ReturnObject } from "./returnObject.resolver";
-import { addToParent, deleteFromParent, generateDate } from "../lib/utils";
+import { generateDate } from "../lib/utils";
+import { User } from "../models/user.model";
+import { ShoppingList } from "../models/shoppingList.model";
 
 
 
@@ -26,54 +28,31 @@ export class ItemResolver {
         @Arg('quantity') quantity: number,
         @Arg('tags', () => [String]) tags: string[],
         @Arg('parentType') parentType: string,
-        @Arg('parentId') parentId: string,
-        //@Ctx() { payload }: AppContext
+        @Ctx() { payload }: AppContext
     ) {
         try { 
             const date = generateDate(expiration);
             const item = await getModelForClass(Item).create({itemName: itemName, expiration: date, quantity: quantity, tags: tags});
-            //await getModelForClass(User).findByIdAndUpdate(payload?.userId,{ $addToSet: {itemIds: item._id}});
-            (addToParent[parentType] || addToParent['default'])(parentId, String(item._id));
+            parentType === "user" ? await getModelForClass(User).findByIdAndUpdate(payload?.userId, { $addToSet: {itemIds: item.id}}) : null;
+            parentType === "list" ? await getModelForClass(ShoppingList).findByIdAndUpdate(payload?.listId, { $addToSet: {itemIds: item.id}}) : null;
         } catch (err) {
             console.error(err)
             return {message: `${err}`, return: false}
         }
         return {message: "OK", return: true}
     }
-/*
-    // Add to ShoppingList
-    @Mutation(() => ReturnObject)
-    @UseMiddleware(isAuth)
-    async addListItem(
-        @Arg('itemName') itemName: string,
-        @Arg('expiration') expiration: string,
-        @Arg('quantity') quantity: number,
-        @Arg('tags', () => [String]) tags: string[],
-        @Arg('listId') listId: string
-    ) {
-        try {
-            const date = generateDate(expiration)
-            const item = await getModelForClass(Item).create({ itemName: itemName, expiration: date, quantity: quantity, tags: tags })
-            await getModelForClass(ShoppingList).findByIdAndUpdate(listId, { $addToSet: { itemIds: item._id } })
 
-        } catch (err) {
-            console.error(err)
-            return { message: `${err}`, return: false }
-        }
-        return { message: "OK", return: true }
-    }
-*/
+
     /* Delete Item */
-
-    // Delete from User
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async deleteItem(
         @Arg('id') id: string,
-        @Arg('parentType') parentType: string
+        @Arg('parentType') parentType: string,
     ) {
         try {
-            (deleteFromParent[parentType] || deleteFromParent['default'])(id);
+            parentType === "user" ? await getModelForClass(User).findOneAndUpdate({$in: {itemIds: id}}, {$pull: {itemIds: id}}) : null;
+            parentType === "list" ?  await getModelForClass(ShoppingList).findOneAndUpdate({$in: {itemIds: id}}, {$pull: {itemIds: id}}): null;
             await getModelForClass(Item).findByIdAndDelete(id);
         } catch (err) {
             console.error(err)
@@ -82,27 +61,8 @@ export class ItemResolver {
         return {message: "OK", return: true}
     }
 
-/*    // Delete from ShoppingList
-    @Mutation(() => ReturnObject)
-    @UseMiddleware(isAuth)
-    async deleteListItem(
-        @Arg('_id') _id: string,
-    ) {
-        try {
-            await getModelForClass(ShoppingList).findOneAndUpdate({ $in: { itemIds: _id } }, { $pull: { itemIds: _id } })
-            await getModelForClass(Item).findByIdAndDelete(_id)
-        } catch (err) {
-            console.error(err)
-            return { message: `${err}`, return: false }
-        }
-        return { message: "OK", return: true }
-    }
-*/
-
 
     /* EDIT ITEM */
-
-    // Edit is Parent Neutral
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async editItem(

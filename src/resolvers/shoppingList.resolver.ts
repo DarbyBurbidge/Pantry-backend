@@ -39,12 +39,11 @@ export class ShoppingListResolver {
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async deleteShoppingList(
-        @Arg('id') id: string,
         @Ctx() { payload }: AppContext
     ) {
         try {
-            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { id });
-            await getModelForClass(ShoppingList).findByIdAndDelete(id);
+            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: null });
+            await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
         } catch (err) {
             console.error(err);
             return { message: `${err}`, return: false }
@@ -57,7 +56,6 @@ export class ShoppingListResolver {
     @UseMiddleware(isAuth)
     async migrateList(
         @Arg('itemIds', () => [String]) itemIds: string[],
-        @Arg('shoppingListId') shoppingListId: string,
         @Ctx() { payload }: AppContext
     ) {
         try {
@@ -113,13 +111,14 @@ export class ShoppingListResolver {
             // Update user's itemIds with Items from list (non-conflicting)
             await UserDoc.findByIdAndUpdate(
                 payload?.userId, {
+                    shoppingListId: null,
                     itemIds: [
                         ...new Set(user?.itemIds.concat(newItemIds))
                     ]
                 }
             );
             // Delete Old ShoppingList
-            await getModelForClass(ShoppingList).findByIdAndDelete(shoppingListId);
+            await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
 
         } catch (err) {
             console.error(err)
