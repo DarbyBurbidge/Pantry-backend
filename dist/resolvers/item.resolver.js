@@ -71,6 +71,36 @@ let ItemResolver = class ItemResolver {
         }
         return { message: "OK", return: true };
     }
+    async setQuant(id, newQuant) {
+        try {
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { quantity: newQuant });
+        }
+        catch (err) {
+            console.error(err);
+            return { message: `${err}`, return: false };
+        }
+        return { message: "OK", return: true };
+    }
+    async setExp(id, newExp) {
+        try {
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { expiration: (0, utils_1.generateDate)(newExp) });
+        }
+        catch (err) {
+            console.error(err);
+            return { message: `${err}`, return: false };
+        }
+        return { message: "OK", return: true };
+    }
+    async setName(id, newName) {
+        try {
+            await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { itemName: newName });
+        }
+        catch (err) {
+            console.error(err);
+            return { message: `${err}`, return: false };
+        }
+        return { message: "OK", return: true };
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [item_model_1.Item], { nullable: true }),
@@ -120,6 +150,33 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ItemResolver.prototype, "toggleFavorite", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('newQuant')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", Promise)
+], ItemResolver.prototype, "setQuant", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('newExp')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ItemResolver.prototype, "setExp", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('newName')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ItemResolver.prototype, "setName", null);
 ItemResolver = __decorate([
     (0, type_graphql_1.Resolver)(item_model_1.Item)
 ], ItemResolver);

@@ -14,7 +14,7 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: ['https://www.thedarby.rocks'],
     credentials: true,
-    maxAge: 600,
+    maxAge: 7200,
     methods: "GET,POST"
 }));
 app.use((0, cookie_parser_1.default)());
