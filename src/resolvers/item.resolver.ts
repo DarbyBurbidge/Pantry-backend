@@ -44,6 +44,7 @@ export class ItemResolver {
 
 
     /* Delete Item */
+
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async deleteItem(
@@ -82,6 +83,7 @@ export class ItemResolver {
         return {message: "OK", return: true}
     }
 
+    /* toggles the favorite entry in the associated item */
     @Mutation(() => ReturnObject)
     @UseMiddleware(isAuth)
     async toggleFavorite(
@@ -91,6 +93,51 @@ export class ItemResolver {
             await getModelForClass(Item).findOneAndUpdate({_id: id}, [{$set:{favorite:{$eq:[false,"$favorite"]}}}]);
         } catch (err) {
             console.error(err)
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async setQuant(
+        @Arg('id') id: string,
+        @Arg('newQuant') newQuant: number
+    ) {
+        try {
+            await getModelForClass(Item).findOneAndUpdate({_id: id}, {quantity: newQuant});
+        } catch (err) {
+            console.error(err);
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async setExp(
+        @Arg('id') id: string,
+        @Arg('newExp') newExp: string
+    ) {
+        try {
+            await getModelForClass(Item).findOneAndUpdate({_id: id}, {expiration: generateDate(newExp)})
+        } catch (err) {
+            console.error(err);
+            return {message: `${err}`, return: false}
+        }
+        return {message: "OK", return: true}
+    }
+
+    @Mutation(() => ReturnObject)
+    @UseMiddleware(isAuth)
+    async setName(
+        @Arg('id') id: string,
+        @Arg('newName') newName: string
+    ) {
+        try {
+            await getModelForClass(Item).findOneAndUpdate({_id: id}, {itemName: newName})
+        } catch (err) {
+            console.error(err);
             return {message: `${err}`, return: false}
         }
         return {message: "OK", return: true}
