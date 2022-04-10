@@ -12,7 +12,7 @@ import { createAccessToken, createRefreshToken, sendRefreshToken } from "./lib/a
 const app = express();
 
 app.use(cors({
-    origin: ['https://www.thedarby.rocks'],
+    origin: ['https://www.thedarby.rocks', 'http://localhost:3000'],
     credentials: true,
     maxAge: 7200,
     methods: "GET,POST" 
