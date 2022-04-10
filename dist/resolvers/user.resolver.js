@@ -22,7 +22,6 @@ const item_model_1 = require("../models/item.model");
 const shoppingList_model_1 = require("../models/shoppingList.model");
 const auth_1 = require("../lib/auth");
 const utils_1 = require("../lib/utils");
-const returnObject_resolver_1 = require("./returnObject.resolver");
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -76,13 +75,16 @@ let UserResolver = class UserResolver {
     async register(email, password) {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
-            await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+            const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).create({ email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+            if (user._id) {
+                return true;
+            }
+            throw new Error("user could not be created");
         }
         catch (err) {
             console.log(err);
-            return { message: `${err}`, return: false };
+            throw new Error(err);
         }
-        return { message: "OK", return: true };
     }
     async registerAndLogin(email, password, { res }) {
         const saltHash = (0, utils_1.hashPassword)(password);
@@ -102,17 +104,16 @@ let UserResolver = class UserResolver {
     async editUser(email, password, { payload }) {
         const saltHash = (0, utils_1.hashPassword)(password);
         try {
-            await (0, typegoose_1.getModelForClass)(user_model_1.User).findOneAndUpdate({ _id: payload === null || payload === void 0 ? void 0 : payload.userId }, { email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
+            return await (0, typegoose_1.getModelForClass)(user_model_1.User).findOneAndUpdate({ _id: payload === null || payload === void 0 ? void 0 : payload.userId }, { email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}` });
         }
         catch (err) {
             console.log(err);
-            return { message: `${err}`, return: false };
+            throw new Error(err);
         }
-        return { message: "OK", return: true };
     }
     async logout({ res }) {
         (0, auth_1.sendRefreshToken)(res, "");
-        return { message: "OK", return: true };
+        return true;
     }
     async items(user) {
         try {
@@ -164,7 +165,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)('email')),
     __param(1, (0, type_graphql_1.Arg)('password')),
     __metadata("design:type", Function),
@@ -181,7 +182,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "registerAndLogin", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => user_model_1.User),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
     __param(0, (0, type_graphql_1.Arg)('email')),
     __param(1, (0, type_graphql_1.Arg)('password')),
@@ -191,7 +192,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "editUser", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

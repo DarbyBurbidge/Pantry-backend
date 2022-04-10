@@ -3,6 +3,8 @@ import { Error } from "mongoose"
 import { AppContext } from "../context/app.context"
 import { MiddlewareFn } from "type-graphql"
 
+/* Takes a Context */
+/*  checks whether or not a particular user is authorized to visit */
 export const isAuth: MiddlewareFn<AppContext> = ({context}, next) => {
     const authorization = context.req.headers['authorization']
 

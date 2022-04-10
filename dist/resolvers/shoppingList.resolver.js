@@ -17,7 +17,6 @@ const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
 const item_model_1 = require("../models/item.model");
 const shoppingList_model_1 = require("../models/shoppingList.model");
-const returnObject_resolver_1 = require("./returnObject.resolver");
 const isauth_middleware_1 = require("../middleware/isauth.middleware");
 const user_model_1 = require("../models/user.model");
 let ShoppingListResolver = class ShoppingListResolver {
@@ -28,24 +27,22 @@ let ShoppingListResolver = class ShoppingListResolver {
     async addShoppingList({ payload }) {
         try {
             const shoppingList = await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).create({ itemIds: [] });
-            await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { shoppingListId: shoppingList._id });
+            return await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { shoppingListId: shoppingList._id });
         }
         catch (err) {
             console.error(err);
-            return { message: `${err}`, return: false };
+            throw new Error(err);
         }
-        return { message: "OK", return: true };
     }
     async deleteShoppingList({ payload }) {
         try {
             await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { shoppingListId: null });
-            await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
+            return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
         }
         catch (err) {
             console.error(err);
-            return { message: `${err}`, return: false };
+            throw new Error(err);
         }
-        return { message: "OK", return: true };
     }
     async migrateList(itemIds, { payload }) {
         try {
@@ -88,13 +85,12 @@ let ShoppingListResolver = class ShoppingListResolver {
                     ...new Set(user === null || user === void 0 ? void 0 : user.itemIds.concat(newItemIds))
                 ]
             });
-            await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
+            return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
         }
         catch (err) {
             console.error(err);
-            return { message: `${err}`, return: false };
+            throw new Error(err);
         }
-        return { message: "OK", return: true };
     }
     async items(shoppingList) {
         try {
@@ -115,7 +111,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "getShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -123,7 +119,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "addShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -131,7 +127,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "deleteShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => returnObject_resolver_1.ReturnObject),
+    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
     (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
     __param(0, (0, type_graphql_1.Arg)('itemIds', () => [String])),
     __param(1, (0, type_graphql_1.Ctx)()),

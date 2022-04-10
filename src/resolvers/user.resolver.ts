@@ -10,7 +10,6 @@ import { Item } from "../models/item.model";
 import { ShoppingList } from "../models/shoppingList.model";
 import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
 import { hashPassword, verifyPassword } from "../lib/utils";
-import { ReturnObject } from "./returnObject.resolver";
 
 
 @ObjectType()
@@ -92,19 +91,22 @@ export class UserResolver {
 
     //Create a new User with client provided info
     //return whether the User was created properly
-    @Mutation(() => ReturnObject)
+    @Mutation(() => Boolean)
     async register(
         @Arg('email') email: string,
         @Arg('password') password: string
     ) {
         const saltHash = hashPassword(password)
         try {
-            await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            const user = await getModelForClass(User).create({email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            if(user._id) {
+                return true
+            }
+            throw new Error("user could not be created")
         } catch (err) {
             console.log(err);
-            return {message: `${err}`, return: false}
+            throw new Error(err)
         }
-        return {message: "OK", return: true}
     }
 
     @Mutation(() => LoginResponse)
@@ -133,7 +135,7 @@ export class UserResolver {
 
     //Create a new User with client provided info
     //return whether the User was created properly
-    @Mutation(() => ReturnObject)
+    @Mutation(() => User)
     @UseMiddleware(isAuth)
     async editUser(    
         @Arg('email') email: string,
@@ -142,22 +144,21 @@ export class UserResolver {
     ) {
         const saltHash = hashPassword(password)
         try {
-            await getModelForClass(User).findOneAndUpdate({_id: payload?.userId}, {email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            return await getModelForClass(User).findOneAndUpdate({_id: payload?.userId}, {email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
         } catch (err) {
             console.log(err);
-            return {message: `${err}`, return: false}
+            throw new Error(err);
         }
-        return {message: "OK", return: true}
     }
 
 
     //Logout the user
-    @Mutation(() => ReturnObject)
+    @Mutation(() => Boolean)
     async logout(
         @Ctx() {res}: AppContext
         ) {
             sendRefreshToken(res, "");
-            return {message: "OK", return: true}
+            return true
         }
 
     

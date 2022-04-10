@@ -3,7 +3,6 @@ import { AppContext } from "../context/app.context";
 import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import { Item } from "../models/item.model";
 import { ShoppingList } from "../models/shoppingList.model";
-import { ReturnObject } from "./returnObject.resolver";
 import { isAuth } from "../middleware/isauth.middleware";
 import { User } from "../models/user.model";
 
@@ -21,38 +20,36 @@ export class ShoppingListResolver {
     }
 
     // List Management Mutations
-    @Mutation(() => ReturnObject)
+    @Mutation(() => ShoppingList)
     @UseMiddleware(isAuth)
     async addShoppingList(
         @Ctx() { payload }: AppContext
     ) {
         try {
             const shoppingList = await getModelForClass(ShoppingList).create({ itemIds: [] });
-            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id });
+            return await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id });
         } catch (err) {
             console.error(err);
-            return { message: `${err}`, return: false }
+            throw new Error(err)
         }
-        return { message: "OK", return: true }
     }
 
-    @Mutation(() => ReturnObject)
+    @Mutation(() => ShoppingList)
     @UseMiddleware(isAuth)
     async deleteShoppingList(
         @Ctx() { payload }: AppContext
     ) {
         try {
             await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: null });
-            await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
+            return await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
         } catch (err) {
             console.error(err);
-            return { message: `${err}`, return: false }
+            throw new Error(err)
         }
-        return { message: "OK", return: true }
 
     }
 
-    @Mutation(() => ReturnObject)
+    @Mutation(() => ShoppingList)
     @UseMiddleware(isAuth)
     async migrateList(
         @Arg('itemIds', () => [String]) itemIds: string[],
@@ -118,13 +115,12 @@ export class ShoppingListResolver {
                 }
             );
             // Delete Old ShoppingList
-            await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
+            return await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
 
         } catch (err) {
             console.error(err)
-            return { message: `${err}`, return: false }
+            throw new Error(err)
         }
-        return { message: "OK", return: true }
     }
 
     // Field Resolvers
