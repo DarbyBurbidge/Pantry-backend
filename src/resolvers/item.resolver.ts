@@ -101,13 +101,11 @@ export class ItemResolver {
         @Arg('newQuant') newQuant: number
     ) {
         try {
-            return await getModelForClass(Item).findOneAndUpdate({_id: id}, {quantity: newQuant}, {new: true});
+            return await getModelForClass(Item).findOneAndUpdate({_id: id}, {quantity: (newQuant < 0) ? 0 : newQuant}, {new: true});
         } catch (err) {
             console.error(err);
             throw new Error(err);
-            //return {message: `${err}`, return: false}
         }
-        //return {message: "OK", return: true}
     }
 
     @Mutation(() => Item)
