@@ -69,7 +69,7 @@ let ItemResolver = class ItemResolver {
     }
     async setQuant(id, newQuant) {
         try {
-            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { quantity: newQuant }, { new: true });
+            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { quantity: (newQuant < 0) ? 0 : newQuant }, { new: true });
         }
         catch (err) {
             console.error(err);
