@@ -115,7 +115,7 @@ export class ItemResolver {
         @Arg('newExp') newExp: string
     ) {
         try {
-            return await getModelForClass(Item).findOneAndUpdate({_id: id}, {expiration: generateDate(newExp)}, {new: true})
+            return await getModelForClass(Item).findOneAndUpdate({_id: id}, {expiration: newExp}, {new: true})
         } catch (err) {
             console.error(err);
             throw new Error(err);

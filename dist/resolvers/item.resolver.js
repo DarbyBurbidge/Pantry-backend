@@ -78,7 +78,7 @@ let ItemResolver = class ItemResolver {
     }
     async setExp(id, newExp) {
         try {
-            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { expiration: (0, utils_1.generateDate)(newExp) }, { new: true });
+            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).findOneAndUpdate({ _id: id }, { expiration: newExp }, { new: true });
         }
         catch (err) {
             console.error(err);
