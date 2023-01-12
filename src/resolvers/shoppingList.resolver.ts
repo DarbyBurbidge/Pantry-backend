@@ -23,10 +23,29 @@ export class ShoppingListResolver {
     @Mutation(() => ShoppingList)
     @UseMiddleware(isAuth)
     async addShoppingList(
+        @Arg('itemIds', () => [String]) itemIds: string[],
         @Ctx() { payload }: AppContext
     ) {
         try {
-            const shoppingList = await getModelForClass(ShoppingList).create({ itemIds: [] });
+            const items = await getModelForClass(Item).find({ _id: { $in: itemIds.map((id: string) => { return new mongoose.Types.ObjectId(id) }) } })
+            const newItems = await Promise.all(items.map(async (userItem) => {
+                return await getModelForClass(Item).create({
+                itemName: userItem.itemName, 
+                expiration: userItem.expiration != 'N/A' ? () => {
+                    const nextWeek = new Date()
+                    nextWeek.setDate(nextWeek.getDate() + 7)
+                    return nextWeek
+                } : 'N/A',
+                    quantity: 1,
+                    tags: userItem.tags,
+                    favorite: true
+                });
+            }));
+            const shoppingList = await getModelForClass(ShoppingList).create({
+                itemIds: newItems.map((newItem) => { 
+                    return newItem._id;
+                })
+            });
             return await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id });
         } catch (err) {
             console.error(err);
@@ -72,7 +91,6 @@ export class ShoppingListResolver {
             // This tells us if we can add it to the user
             // The opposite isn't true (checking if userItem has conflict)
             if (userItems) {
-                console.log('user found');
                 listItems.forEach((listItem) => {
                     const hasConflict = userItems.some((userItem) => {
                         return (userItem.itemName === listItem.itemName) ? (
@@ -84,13 +102,6 @@ export class ShoppingListResolver {
                     !hasConflict ? newItemIds.push(listItem.id) : null;
                 })
             }
-
-            newItemIds.forEach((newItemId) => {
-                console.log(`New Item: ${newItemId}`);
-            })
-            conflictingItems.forEach((conflictingItem) => {
-                console.log(`Conflicts: ${conflictingItem.userItem.itemName} and ${conflictingItem.listItem.itemName}`);
-            })
 
             // Use list of conflicts to update users existing items
             // After updating, delete the listItem since it's properties are no longer needed
