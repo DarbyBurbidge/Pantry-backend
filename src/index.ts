@@ -40,5 +40,5 @@ db.once('open', async () => {
     });
     await apolloServer.start()
     apolloServer.applyMiddleware({app, cors: false})
-    app.listen(process.env.PORT, () => {console.log(`Listening on port ${process.env.PORT}`)})
+    app.listen({port: process.env.PORT, host: process.env.HOST}, () => {console.log(`Listening on port ${process.env.PORT}`)})
 })();

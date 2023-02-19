@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "v16.13.0"
+    "node": ">=18.13.0"
   },
   "dependencies": {
     "@typegoose/typegoose": "^9.4.0",
