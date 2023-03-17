@@ -1,11 +1,12 @@
-import { mongoose, prop } from "@typegoose/typegoose";
+import { Severity, modelOptions, mongoose, prop } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
-import { Item } from "./item.model";
-import { ShoppingList } from "../models/shoppingList.model";
+import { Item } from "./item.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
 
 
-@ObjectType()
+@ObjectType() @modelOptions({ options: { allowMixed: Severity.ERROR }})
 export class User {
+
 
     // User Document Information
     @Field(() => ID) @prop({ auto: true })
@@ -24,14 +25,14 @@ export class User {
     tokenVersion: number;
 
     // Related Document information
-    @ Field(() => [String]) @prop()
+    @Field(() => [String]) @prop({ required: true, type: String, default: [] })
     itemIds: string[]
 
     @Field(() => [Item], { nullable: true })
-    items: [Item];
+    items: Item[];
 
-    @prop()
-    shoppingListId: string | null;
+    @prop({default: undefined})
+    shoppingListId?: string;
 
     @Field(() => ShoppingList, { nullable: true})
     shoppingList: ShoppingList;

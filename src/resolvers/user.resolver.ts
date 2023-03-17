@@ -3,13 +3,13 @@ import { Arg, Field, Ctx, FieldResolver, Mutation, ObjectType, Query, Resolver, 
 import { getModelForClass } from "@typegoose/typegoose";
 import { verify } from "jsonwebtoken";
 // DEV MODULES
-import { AppContext } from "../context/app.context";
-import { isAuth } from "../middleware/isauth.middleware";
-import { User } from "../models/user.model";
-import { Item } from "../models/item.model";
-import { ShoppingList } from "../models/shoppingList.model";
-import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth";
-import { hashPassword, verifyPassword } from "../lib/utils";
+import { AppContext } from "../context/app.context.js";
+import { isAuth } from "../middleware/isauth.middleware.js";
+import { User } from "../models/user.model.js";
+import { Item } from "../models/item.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
+import { sendRefreshToken, createRefreshToken, createAccessToken } from "../lib/auth.js";
+import { hashPassword, verifyPassword } from "../lib/utils.js";
 
 
 @ObjectType()
@@ -22,19 +22,6 @@ class LoginResponse {
 
 @Resolver(User)
 export class UserResolver {
-    @Query(() => String)
-    hello() {
-        return "working!"
-    }
-
-    @Query(() => String)
-    @UseMiddleware(isAuth)
-    bye(
-        @Ctx() {payload}: AppContext
-    ) {
-        return `your user id is: ${payload!.userId}`
-    }
-
 
     //Get current User
     @Query(() => User, { nullable: true })

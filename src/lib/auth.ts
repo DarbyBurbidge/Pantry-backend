@@ -1,10 +1,11 @@
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { sign } = jwt;
 import { Response } from "express";
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 
 
 export const createAccessToken = (user: User) => {
-    return sign({ userId: user._id.toString(), listId: user.shoppingListId}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: "15m", algorithm: 'ES512'});
+    return sign({ userId: user._id.toString(), listId: user.shoppingListId}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: "1m", algorithm: 'ES512'});
 };
 
 export const createRefreshToken = (user: User) => {
@@ -18,8 +19,8 @@ export const sendRefreshToken = (res: Response, token: string) => {
         {
             httpOnly: true,
             path: '/refresh_token',
-            sameSite: 'none',
-            secure: true
+            sameSite: 'strict',
+            secure: false
         }
     );
 };

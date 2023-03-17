@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,29 +7,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShoppingList = void 0;
-const typegoose_1 = require("@typegoose/typegoose");
-const type_graphql_1 = require("type-graphql");
-const item_model_1 = require("./item.model");
+import { Severity, modelOptions, mongoose, prop } from "@typegoose/typegoose";
+import { Field, ID, ObjectType } from "type-graphql";
+import { Item } from "./item.model.js";
 let ShoppingList = class ShoppingList {
+    _id;
+    itemIds;
+    items;
 };
 __decorate([
-    (0, type_graphql_1.Field)(() => type_graphql_1.ID),
-    (0, typegoose_1.prop)({ auto: true }),
-    __metadata("design:type", typegoose_1.mongoose.Types.ObjectId)
+    Field(() => ID),
+    prop({ auto: true }),
+    __metadata("design:type", mongoose.Types.ObjectId)
 ], ShoppingList.prototype, "_id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [String]),
-    (0, typegoose_1.prop)({ required: true }),
+    Field(() => [String]),
+    prop({ required: true, type: String, default: [] }),
     __metadata("design:type", Array)
 ], ShoppingList.prototype, "itemIds", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [item_model_1.Item], { nullable: true }),
+    Field(() => [Item], { nullable: true }),
     __metadata("design:type", Array)
 ], ShoppingList.prototype, "items", void 0);
 ShoppingList = __decorate([
-    (0, type_graphql_1.ObjectType)()
+    ObjectType(),
+    modelOptions({ options: { allowMixed: Severity.ERROR } })
 ], ShoppingList);
-exports.ShoppingList = ShoppingList;
+export { ShoppingList };
 //# sourceMappingURL=shoppingList.model.js.map

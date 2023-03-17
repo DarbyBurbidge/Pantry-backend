@@ -5,14 +5,14 @@ import cors from "cors";
 import express from "express";
 import { verify } from "jsonwebtoken";
 // DEV MODULES
-import { User } from "./models/user.model";
-import { createAccessToken, createRefreshToken, sendRefreshToken } from "./lib/auth";
+import { User } from "./models/user.model.js";
+import { createAccessToken, createRefreshToken, sendRefreshToken } from "./lib/auth.js";
 
 
-const app = express();
+export const app = express();
 
 app.use(cors({
-    origin: ['https://www.thedarby.rocks', 'http://localhost:3000'],
+    origin: ['https://www.easypantry.app', 'https://easypantry.app', 'http://app.localhost:3000'],
     credentials: true,
     maxAge: 7200,
     methods: "GET,POST" 
@@ -61,5 +61,3 @@ app.post("/refresh_token", async (req, res) => {
     //return a valid AccessToken
     return res.send({ ok: true, accessToken: createAccessToken(user)})
 })
-
-export default app

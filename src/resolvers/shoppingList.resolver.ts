@@ -1,10 +1,10 @@
 import { getModelForClass, mongoose } from "@typegoose/typegoose";
-import { AppContext } from "../context/app.context";
 import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
-import { Item } from "../models/item.model";
-import { ShoppingList } from "../models/shoppingList.model";
-import { isAuth } from "../middleware/isauth.middleware";
-import { User } from "../models/user.model";
+import { AppContext } from "../context/app.context.js";
+import { Item } from "../models/item.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
+import { isAuth } from "../middleware/isauth.middleware.js";
+import { User } from "../models/user.model.js";
 
 
 @Resolver(ShoppingList)

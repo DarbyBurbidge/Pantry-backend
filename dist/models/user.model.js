@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,56 +7,64 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const typegoose_1 = require("@typegoose/typegoose");
-const type_graphql_1 = require("type-graphql");
-const item_model_1 = require("./item.model");
-const shoppingList_model_1 = require("../models/shoppingList.model");
+import { Severity, modelOptions, mongoose, prop } from "@typegoose/typegoose";
+import { Field, ID, ObjectType } from "type-graphql";
+import { Item } from "./item.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
 let User = class User {
+    _id;
+    email;
+    salt;
+    pw_hash;
+    tokenVersion;
+    itemIds;
+    items;
+    shoppingListId;
+    shoppingList;
 };
 __decorate([
-    (0, type_graphql_1.Field)(() => type_graphql_1.ID),
-    (0, typegoose_1.prop)({ auto: true }),
-    __metadata("design:type", typegoose_1.mongoose.Types.ObjectId)
+    Field(() => ID),
+    prop({ auto: true }),
+    __metadata("design:type", mongoose.Types.ObjectId)
 ], User.prototype, "_id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true, unique: true }),
+    Field(),
+    prop({ required: true, unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, typegoose_1.prop)({ required: true }),
+    prop({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "salt", void 0);
 __decorate([
-    (0, typegoose_1.prop)({ required: true }),
+    prop({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "pw_hash", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ default: 0 }),
+    Field(),
+    prop({ default: 0 }),
     __metadata("design:type", Number)
 ], User.prototype, "tokenVersion", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [String]),
-    (0, typegoose_1.prop)(),
+    Field(() => [String]),
+    prop({ required: true, type: String, default: [] }),
     __metadata("design:type", Array)
 ], User.prototype, "itemIds", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [item_model_1.Item], { nullable: true }),
+    Field(() => [Item], { nullable: true }),
     __metadata("design:type", Array)
 ], User.prototype, "items", void 0);
 __decorate([
-    (0, typegoose_1.prop)(),
-    __metadata("design:type", Object)
+    prop({ default: undefined }),
+    __metadata("design:type", String)
 ], User.prototype, "shoppingListId", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => shoppingList_model_1.ShoppingList, { nullable: true }),
-    __metadata("design:type", shoppingList_model_1.ShoppingList)
+    Field(() => ShoppingList, { nullable: true }),
+    __metadata("design:type", ShoppingList)
 ], User.prototype, "shoppingList", void 0);
 User = __decorate([
-    (0, type_graphql_1.ObjectType)()
+    ObjectType(),
+    modelOptions({ options: { allowMixed: Severity.ERROR } })
 ], User);
-exports.User = User;
+export { User };
 //# sourceMappingURL=user.model.js.map

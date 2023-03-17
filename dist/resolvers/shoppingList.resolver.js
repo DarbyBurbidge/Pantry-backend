@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,23 +10,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShoppingListResolver = void 0;
-const typegoose_1 = require("@typegoose/typegoose");
-const type_graphql_1 = require("type-graphql");
-const item_model_1 = require("../models/item.model");
-const shoppingList_model_1 = require("../models/shoppingList.model");
-const isauth_middleware_1 = require("../middleware/isauth.middleware");
-const user_model_1 = require("../models/user.model");
+import { getModelForClass, mongoose } from "@typegoose/typegoose";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
+import { Item } from "../models/item.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
+import { isAuth } from "../middleware/isauth.middleware.js";
+import { User } from "../models/user.model.js";
 let ShoppingListResolver = class ShoppingListResolver {
     async getShoppingList({ payload }) {
-        const user = await (0, typegoose_1.getModelForClass)(user_model_1.User).findById({ _id: payload === null || payload === void 0 ? void 0 : payload.userId });
-        return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findById({ _id: user === null || user === void 0 ? void 0 : user.shoppingListId });
+        const user = await getModelForClass(User).findById({ _id: payload?.userId });
+        return await getModelForClass(ShoppingList).findById({ _id: user?.shoppingListId });
     }
-    async addShoppingList({ payload }) {
+    async addShoppingList(itemIds, { payload }) {
         try {
-            const shoppingList = await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).create({ itemIds: [] });
-            return await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { shoppingListId: shoppingList._id });
+            const items = await getModelForClass(Item).find({ _id: { $in: itemIds.map((id) => { return new mongoose.Types.ObjectId(id); }) } });
+            const newItems = await Promise.all(items.map(async (userItem) => {
+                return await getModelForClass(Item).create({
+                    itemName: userItem.itemName,
+                    expiration: userItem.expiration != 'N/A' ? () => {
+                        const nextWeek = new Date();
+                        nextWeek.setDate(nextWeek.getDate() + 7);
+                        return nextWeek;
+                    } : 'N/A',
+                    quantity: 1,
+                    tags: userItem.tags,
+                    favorite: true
+                });
+            }));
+            const shoppingList = await getModelForClass(ShoppingList).create({
+                itemIds: newItems.map((newItem) => {
+                    return newItem._id;
+                })
+            });
+            return await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: shoppingList._id });
         }
         catch (err) {
             console.error(err);
@@ -36,8 +51,8 @@ let ShoppingListResolver = class ShoppingListResolver {
     }
     async deleteShoppingList({ payload }) {
         try {
-            await (0, typegoose_1.getModelForClass)(user_model_1.User).findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, { shoppingListId: null });
-            return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
+            await getModelForClass(User).findByIdAndUpdate(payload?.userId, { shoppingListId: null });
+            return await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
         }
         catch (err) {
             console.error(err);
@@ -46,16 +61,15 @@ let ShoppingListResolver = class ShoppingListResolver {
     }
     async migrateList(itemIds, { payload }) {
         try {
-            const ItemDoc = (0, typegoose_1.getModelForClass)(item_model_1.Item);
-            const UserDoc = (0, typegoose_1.getModelForClass)(user_model_1.User);
-            const listItems = await ItemDoc.find({ _id: { $in: itemIds.map((id) => { return new typegoose_1.mongoose.Types.ObjectId(id); }) } });
-            const user = await UserDoc.findById(payload === null || payload === void 0 ? void 0 : payload.userId);
-            const userItemIds = user === null || user === void 0 ? void 0 : user.itemIds;
-            const userItems = await ItemDoc.find({ _id: { $in: userItemIds === null || userItemIds === void 0 ? void 0 : userItemIds.map((id) => { return new typegoose_1.mongoose.Types.ObjectId(id); }) } });
+            const ItemDoc = getModelForClass(Item);
+            const UserDoc = getModelForClass(User);
+            const listItems = await ItemDoc.find({ _id: { $in: itemIds.map((id) => { return new mongoose.Types.ObjectId(id); }) } });
+            const user = await UserDoc.findById(payload?.userId);
+            const userItemIds = user?.itemIds;
+            const userItems = await ItemDoc.find({ _id: { $in: userItemIds?.map((id) => { return new mongoose.Types.ObjectId(id); }) } });
             let conflictingItems = [];
             let newItemIds = [];
             if (userItems) {
-                console.log('user found');
                 listItems.forEach((listItem) => {
                     const hasConflict = userItems.some((userItem) => {
                         return (userItem.itemName === listItem.itemName) ? (conflictingItems.push({ userItem: userItem, listItem: listItem })) : (false);
@@ -63,12 +77,6 @@ let ShoppingListResolver = class ShoppingListResolver {
                     !hasConflict ? newItemIds.push(listItem.id) : null;
                 });
             }
-            newItemIds.forEach((newItemId) => {
-                console.log(`New Item: ${newItemId}`);
-            });
-            conflictingItems.forEach((conflictingItem) => {
-                console.log(`Conflicts: ${conflictingItem.userItem.itemName} and ${conflictingItem.listItem.itemName}`);
-            });
             conflictingItems.forEach(async (conflictingItem) => {
                 await ItemDoc.findOneAndUpdate({
                     _id: conflictingItem.userItem._id
@@ -79,13 +87,13 @@ let ShoppingListResolver = class ShoppingListResolver {
                 });
                 await ItemDoc.findByIdAndDelete(conflictingItem.listItem._id);
             });
-            await UserDoc.findByIdAndUpdate(payload === null || payload === void 0 ? void 0 : payload.userId, {
+            await UserDoc.findByIdAndUpdate(payload?.userId, {
                 shoppingListId: null,
                 itemIds: [
-                    ...new Set(user === null || user === void 0 ? void 0 : user.itemIds.concat(newItemIds))
+                    ...new Set(user?.itemIds.concat(newItemIds))
                 ]
             });
-            return await (0, typegoose_1.getModelForClass)(shoppingList_model_1.ShoppingList).findByIdAndDelete(payload === null || payload === void 0 ? void 0 : payload.listId);
+            return await getModelForClass(ShoppingList).findByIdAndDelete(payload?.listId);
         }
         catch (err) {
             console.error(err);
@@ -94,7 +102,7 @@ let ShoppingListResolver = class ShoppingListResolver {
     }
     async items(shoppingList) {
         try {
-            return await (0, typegoose_1.getModelForClass)(item_model_1.Item).find({ _id: { $in: shoppingList.itemIds } });
+            return await getModelForClass(Item).find({ _id: { $in: shoppingList.itemIds } });
         }
         catch (err) {
             console.error(err);
@@ -103,47 +111,48 @@ let ShoppingListResolver = class ShoppingListResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => shoppingList_model_1.ShoppingList, { nullable: true }),
-    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Ctx)()),
+    Query(() => ShoppingList, { nullable: true }),
+    UseMiddleware(isAuth),
+    __param(0, Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "getShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
-    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Ctx)()),
+    Mutation(() => ShoppingList),
+    UseMiddleware(isAuth),
+    __param(0, Arg('itemIds', () => [String])),
+    __param(1, Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Array, Object]),
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "addShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
-    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Ctx)()),
+    Mutation(() => ShoppingList),
+    UseMiddleware(isAuth),
+    __param(0, Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "deleteShoppingList", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => shoppingList_model_1.ShoppingList),
-    (0, type_graphql_1.UseMiddleware)(isauth_middleware_1.isAuth),
-    __param(0, (0, type_graphql_1.Arg)('itemIds', () => [String])),
-    __param(1, (0, type_graphql_1.Ctx)()),
+    Mutation(() => ShoppingList),
+    UseMiddleware(isAuth),
+    __param(0, Arg('itemIds', () => [String])),
+    __param(1, Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Array, Object]),
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "migrateList", null);
 __decorate([
-    (0, type_graphql_1.FieldResolver)(() => [item_model_1.Item], { nullable: true }),
-    __param(0, (0, type_graphql_1.Root)()),
+    FieldResolver(() => [Item], { nullable: true }),
+    __param(0, Root()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ShoppingListResolver.prototype, "items", null);
 ShoppingListResolver = __decorate([
-    (0, type_graphql_1.Resolver)(shoppingList_model_1.ShoppingList)
+    Resolver(ShoppingList)
 ], ShoppingListResolver);
-exports.ShoppingListResolver = ShoppingListResolver;
+export { ShoppingListResolver };
 //# sourceMappingURL=shoppingList.resolver.js.map

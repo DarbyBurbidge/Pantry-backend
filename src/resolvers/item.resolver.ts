@@ -1,11 +1,11 @@
 import { getModelForClass } from "@typegoose/typegoose";
-import { Item } from "../models/item.model";
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
-import { AppContext } from "../context/app.context";
-import { isAuth } from "../middleware/isauth.middleware";
-import { generateDate } from "../lib/utils";
-import { User } from "../models/user.model";
-import { ShoppingList } from "../models/shoppingList.model";
+import { Item } from "../models/item.model.js";
+import { AppContext } from "../context/app.context.js";
+import { isAuth } from "../middleware/isauth.middleware.js";
+import { generateDate } from "../lib/utils.js";
+import { User } from "../models/user.model.js";
+import { ShoppingList } from "../models/shoppingList.model.js";
 
 
 

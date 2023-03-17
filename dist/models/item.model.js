@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,44 +7,49 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Item = void 0;
-const typegoose_1 = require("@typegoose/typegoose");
-const type_graphql_1 = require("type-graphql");
+import { Severity, modelOptions, mongoose, prop } from "@typegoose/typegoose";
+import { Field, ID, ObjectType } from "type-graphql";
 let Item = class Item {
+    _id;
+    itemName;
+    expiration;
+    quantity;
+    tags;
+    favorite;
 };
 __decorate([
-    (0, type_graphql_1.Field)(() => type_graphql_1.ID),
-    (0, typegoose_1.prop)({ auto: true }),
-    __metadata("design:type", typegoose_1.mongoose.Types.ObjectId)
+    Field(() => ID),
+    prop({ auto: true }),
+    __metadata("design:type", mongoose.Types.ObjectId)
 ], Item.prototype, "_id", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
+    Field(),
+    prop({ required: true }),
     __metadata("design:type", String)
 ], Item.prototype, "itemName", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ required: true }),
+    Field(),
+    prop({ required: true }),
     __metadata("design:type", String)
 ], Item.prototype, "expiration", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ type: Number, required: true }),
+    Field(),
+    prop({ type: Number, required: true }),
     __metadata("design:type", Number)
 ], Item.prototype, "quantity", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [String]),
-    (0, typegoose_1.prop)({ required: true }),
+    Field(() => [String]),
+    prop({ required: true, type: String, default: [] }),
     __metadata("design:type", Array)
 ], Item.prototype, "tags", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typegoose_1.prop)({ default: false }),
+    Field(),
+    prop({ default: false }),
     __metadata("design:type", Boolean)
 ], Item.prototype, "favorite", void 0);
 Item = __decorate([
-    (0, type_graphql_1.ObjectType)()
+    ObjectType(),
+    modelOptions({ options: { allowMixed: Severity.ERROR } })
 ], Item);
-exports.Item = Item;
+export { Item };
 //# sourceMappingURL=item.model.js.map

@@ -1,0 +1,7 @@
+# exclude everything
+*
+
+# include specifics
+!package*.json
+!src
+!tsconfig.json

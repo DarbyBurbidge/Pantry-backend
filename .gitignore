@@ -10,3 +10,4 @@ yarn.lock
 *.log
 #keys
 ssh_*
+cert
