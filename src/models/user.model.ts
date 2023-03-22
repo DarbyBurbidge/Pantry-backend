@@ -7,6 +7,8 @@ import { ShoppingList } from "../models/shoppingList.model.js";
 @ObjectType() @modelOptions({ options: { allowMixed: Severity.ERROR }})
 export class User {
 
+    @prop({ index: true, expires: 7890000, default: Date.now }) // 3months
+    ttl: string
 
     // User Document Information
     @Field(() => ID) @prop({ auto: true })

@@ -5,6 +5,10 @@ import { Item } from "./item.model.js";
 @ObjectType() @modelOptions({ options: { allowMixed: Severity.ERROR }})
 export class ShoppingList {
 
+
+    @prop({ index: true, expires: 15780000, default: Date.now }) // 3months
+    ttl: string
+
     @Field(() => ID) @prop({ auto: true })
     readonly _id: mongoose.Types.ObjectId;
 

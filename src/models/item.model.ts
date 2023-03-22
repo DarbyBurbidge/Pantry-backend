@@ -4,6 +4,10 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 @ObjectType() @modelOptions({ options: { allowMixed: Severity.ERROR }})
 export class Item {
+
+    @prop({ index: true, expires: 15780000, default: Date.now }) // 3months
+    ttl: string
+
     @Field(() => ID) @prop({ auto: true })
     readonly _id: mongoose.Types.ObjectId;
 

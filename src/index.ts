@@ -1,20 +1,19 @@
 // NPM MODULES
-import "reflect-metadata"
+import "reflect-metadata";
+//import { createServer } from "https";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4"
 import { buildSchema } from "type-graphql";
-import { createServer } from "https";
 // DEV MODULES
 import { app } from "./server.js";
 import { UserResolver } from "./resolvers/user.resolver.js";
 import { ItemResolver } from "./resolvers/item.resolver.js";
 import { ShoppingListResolver } from "./resolvers/shoppingList.resolver.js";
 import { getSecrets } from "./AWSsecrets.js";
+import { AppContext } from "./context/app.context.js";
 
-
-console.log(process.env)
 if (process.env.NODE_ENV === "prod") {
     try {
         await getSecrets()
@@ -24,12 +23,11 @@ if (process.env.NODE_ENV === "prod") {
 } else {
     dotenv.config()
 }
-console.log(process.env)
 mongoose.connect(
     `${process.env.DB_URI}`,
     async err => {
         if (err) {
-            console.log(err)
+            console.error(err)
             process.exit(1)
         }
     }
@@ -43,13 +41,19 @@ db.once('open', async () => {
 });
 
 (async () => {
-    const apolloServer = new ApolloServer({
+    const apolloServer = new ApolloServer<AppContext>({
         schema: await buildSchema({
             resolvers: [ UserResolver, ItemResolver, ShoppingListResolver ]
-        })
+        }),
+        introspection: process.env.NODE_ENV !== 'prod'
     });
     await apolloServer.start()
-    app.use('/graphql', expressMiddleware(apolloServer))
-    const server = createServer(app)
-    server.listen({ port: process.env.PORT }, () => {console.log(`Listening on port ${process.env.PORT}`)});
+    app.use('/graphql',
+        expressMiddleware(apolloServer, {
+            // Must name context here since AppContext is a custom context
+            context: async ({req, res}) => ({req, res})
+        })
+    )
+
+    app.listen({ port: process.env.PORT }, () => {console.log(`Listening on port ${process.env.PORT}`)});
 })();

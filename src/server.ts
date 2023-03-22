@@ -2,7 +2,7 @@
 import { getModelForClass } from "@typegoose/typegoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
+import express, { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 // DEV MODULES
 import { User } from "./models/user.model.js";
@@ -12,7 +12,7 @@ import { createAccessToken, createRefreshToken, sendRefreshToken } from "./lib/a
 export const app = express();
 
 app.use(cors({
-    origin: ['https://www.easypantry.app', 'https://easypantry.app', 'http://app.localhost:3000'],
+    origin: ['https://www.easypantry.app', 'https://easypantry.app', 'http://localhost:3000', 'easypantry-loadbalancer-1590599396.us-east-2.elb.amazonaws.com'],
     credentials: true,
     maxAge: 7200,
     methods: "GET,POST" 
@@ -20,7 +20,11 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-app.post("/refresh_token", async (req, res) => {
+app.get("/health", async (_, res) => {
+    res.send()
+})
+
+app.post("/refresh_token", async (req: Request, res: Response) => {
     const token = req.cookies.jid;
     console.log("attempting refresh")
 

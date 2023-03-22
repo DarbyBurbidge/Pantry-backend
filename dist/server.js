@@ -14,6 +14,9 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.get("/health", async (_, res) => {
+    res.send({ ok: true, body: "server is live" });
+});
 app.post("/refresh_token", async (req, res) => {
     const token = req.cookies.jid;
     console.log("attempting refresh");

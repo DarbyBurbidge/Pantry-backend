@@ -20,7 +20,7 @@ export const sendRefreshToken = (res: Response, token: string) => {
             httpOnly: true,
             path: '/refresh_token',
             sameSite: 'strict',
-            secure: false
+            secure: true
         }
     );
 };

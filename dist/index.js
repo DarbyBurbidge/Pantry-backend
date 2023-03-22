@@ -1,16 +1,15 @@
 import "reflect-metadata";
+import { createServer } from "https";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { buildSchema } from "type-graphql";
-import { createServer } from "https";
 import { app } from "./server.js";
 import { UserResolver } from "./resolvers/user.resolver.js";
 import { ItemResolver } from "./resolvers/item.resolver.js";
 import { ShoppingListResolver } from "./resolvers/shoppingList.resolver.js";
 import { getSecrets } from "./AWSsecrets.js";
-console.log(process.env);
 if (process.env.NODE_ENV === "prod") {
     try {
         await getSecrets();
@@ -22,10 +21,9 @@ if (process.env.NODE_ENV === "prod") {
 else {
     dotenv.config();
 }
-console.log(process.env);
 mongoose.connect(`${process.env.DB_URI}`, async (err) => {
     if (err) {
-        console.log(err);
+        console.error(err);
         process.exit(1);
     }
 });
@@ -42,7 +40,11 @@ db.once('open', async () => {
     });
     await apolloServer.start();
     app.use('/graphql', expressMiddleware(apolloServer));
-    const server = createServer(app);
-    server.listen({ port: process.env.PORT }, () => { console.log(`Listening on port ${process.env.PORT}`); });
+    createServer({
+        key: process.env.SSL_KEY,
+        cert: process.env.SSL_CERT,
+        ca: process.env.SSL_CA
+    }, app);
+    app.listen({ port: process.env.PORT }, () => { console.log(`Listening on port ${process.env.PORT}`); });
 })();
 //# sourceMappingURL=index.js.map

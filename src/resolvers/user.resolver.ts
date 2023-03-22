@@ -57,6 +57,7 @@ export class UserResolver {
         @Arg('password') password: string,
         @Ctx() {res}: AppContext
     ): Promise<LoginResponse> {
+        console.log(res)
         const user = await getModelForClass(User).findOne({email: `${email}`})
         if (!user) {
             throw new Error('could not find user');
@@ -131,7 +132,7 @@ export class UserResolver {
     ) {
         const saltHash = hashPassword(password)
         try {
-            return await getModelForClass(User).findOneAndUpdate({_id: payload?.userId}, {email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`});
+            return await getModelForClass(User).findOneAndUpdate({_id: payload?.userId}, {email: `${email}`, salt: `${saltHash.salt}`, pw_hash: `${saltHash.hash}`, ttl: ""});
         } catch (err) {
             console.log(err);
             throw new Error(err);
