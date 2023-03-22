@@ -4,17 +4,6 @@
 
 Easy Pantry is a website I designed and built from the ground up to help me track what I had in my kitchen pantry.
 
-#### Major (and minor) resources:
-[JWT Authentication by Ben Awad]( https://www.youtube.com/watch?v=25GS0MLT8JU&t=7512s)
-
-This was by far and away the most thorough and helpful guide I could find on the concept of JWTs and I couldn't have even started this app without it. One of the few that didn't say "You shouldn't do this, but I'm going to do it anyway." Security is important and I didn't know enough to feel comfortable doing it myself.
-
-##### Stack Overflow
-
-##### Various Documentation Pages
-
-##### Github issues
-
 ## Design decisions
 
 I wanted it to be minimal, simple, and easy to use. I didn't like apps with a lot of adds, and I also didn't want to fuss with things like scanning QR codes or barcodes and dealing with an overabundance of information (both as a user and a dev). In that sense it was an oportunity to learn how to write my own api, rather than use someone else's.
@@ -52,6 +41,17 @@ Docker didn't become a part of the project plan until much later when I had mess
 
 #### AWS
 Once I had figured out I wanted to use docker, I planned on running it on a personal Kubernetes cluster I had built from Raspberry Pi's. In practice this was a massive pain and I didn't have nearly enough knowledge to tackle it on my first go. This is where AWS stepped in. AWS had a much friendlier introductory experience, and I was able to get everything up and running in half the time I had wasted on K8S. I would still like to get it running on my personal cluster, but I needed the app up and running for job applications and that meant I had to go with the option that "just worked" rather than continue trying to get fancy.
+
+#### Major (and minor) resources:
+[JWT Authentication by Ben Awad]( https://www.youtube.com/watch?v=25GS0MLT8JU&t=7512s)
+
+This was by far and away the most thorough and helpful guide I could find on the concept of JWTs and I couldn't have even started this app without it. One of the few that didn't say "You shouldn't do this, but I'm going to do it anyway." Security is important and I didn't know enough to feel comfortable doing it myself.
+
+##### Stack Overflow
+
+##### Various Documentation Pages
+
+##### Github issues
 
 ---
 If you have any other questions about how or why I did something please feel free to ask. I'd love to talk about it. - Darby
