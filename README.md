@@ -21,9 +21,9 @@ User A adds an Item C to their account, if User B also adds Item C, there are tw
 The app was originally designed to match the way I thought about my own pantry, where Items existed on the "top-right-shelf" or "above-the-fridge." The idea being you could search for an item "Do I have Paprika?" and it would return with "yes, it's in "bottom-center-shelf." In practice when I tested that version, people didn't care so much about where something was and instead wanted things like "Do I have snacks?" or "What Spices do I have?" It seems small, but Tags really are a much more intuitive way for a lot of people to find stuff. I may still re-implement something like Categories again in the future, but it would be in conjunction with the tag system.
 
 ### Additional Ideas
-##### Allowing multiple users to access the same pantry
+#### Allowing multiple users to access the same pantry
 This is probably the biggest feature I would like to add. Seeing as a User *is* a Pantry, it is better to simply recommend that users share an account at least for now.
-##### Recommended tags for items
+#### Recommended tags for items
 This one was a suggestion I received from a friend, and while I like the idea at face value, I do think that it goes against the initial premise of the app. While this may be useful for many people, there are people who dislike technology that feels like it's 'watching' them. Something like scanning the database for "milk" and suggesting "dairy" because it's the most common tag, while innocuous, is exactly the kind of thing I was intending to avoid. It also gets in the way of users being able to tailor their own experience. Because of this, I am unlikely to add things like this.
 
 ### Tool choices
