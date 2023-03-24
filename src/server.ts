@@ -24,7 +24,7 @@ app.get("/health", async (_, res) => {
     res.send()
 })
 
-app.post("/refresh_token", async (req: Request, res: Response) => {
+app.post("/refresh", async (req: Request, res: Response) => {
     const token = req.cookies.jid;
     console.log("attempting refresh")
 
